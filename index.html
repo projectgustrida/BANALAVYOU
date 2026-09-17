@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Food - Pemesanan Makanan Online</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FFBF1E',
+                        'primary-dark': '#e6a80d',
+                        'dark-bg': '#261A16',
+                        'dark-card': '#382112',
+                        'dark-accent': '#593720',
+                        'light-bg': '#FDFBF7',
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 8px 25px -5px rgba(255, 191, 30, 0.4)',
+                        'card': '0 10px 30px rgba(38, 26, 22, 0.08)',
+                        'nav': '0 -5px 20px rgba(38, 26, 22, 0.1)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #261A16;
+            color: #FDFBF7;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @keyframes pulse-subtle {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .pulse-btn {
+            animation: pulse-subtle 2s infinite ease-in-out;
+        }
+
+        .glass-panel {
+            background: rgba(56, 33, 18, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 191, 30, 0.15);
+        }
+
+        .glass-nav {
+            background: rgba(38, 26, 22, 0.95);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(89, 55, 32, 0.5);
+        }
+
+        .category-card.active {
+            background-color: #FFBF1E;
+            color: #261A16;
+            transform: translateY(-2px);
+        }
+
+        .category-card.active i {
+            color: #261A16 !important;
+        }
+
+        /* Animasi untuk notifikasi & popup */
+        @keyframes slide-in-right {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slide-out-right {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+    </style>
+</head>
+
+<body
+    class="min-h-screen pb-24 md:pb-8 bg-dark-bg text-gray-100 flex justify-center selection:bg-primary selection:text-dark-bg">
+
+    <div
+        class="w-full max-w-md md:max-w-4xl min-h-screen bg-dark-bg flex flex-col relative shadow-2xl overflow-x-hidden">
+
+        <!-- Header Top Bar - UPDATE -->
+        <header class="sticky top-0 z-30 glass-panel px-4 py-3 flex items-center justify-between gap-3 shadow-md">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-dark-bg font-bold text-xl shadow-glow">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1 text-xs text-gray-400">
+                        <i class="fa-solid fa-location-dot text-primary"></i>
+                        <span>Kirim ke:</span>
+                    </div>
+                    <button data-action="change-location"
+                        class="flex items-center gap-1 font-semibold text-sm text-white hover:text-primary transition-colors">
+                        <span id="current-location">Jl. Sudirman No. 45, Jakarta</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-primary"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button data-action="switch-tab" data-tab="cart"
+                    class="relative p-2.5 rounded-full bg-dark-card hover:bg-dark-accent transition text-gray-200">
+                    <i class="fa-solid fa-bag-shopping text-lg text-primary"></i>
+                    <span id="cart-badge"
+                        class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-dark-bg">0</span>
+                </button>
+
+                <!-- Auth Button (Dynamic) -->
+                <div id="auth-section">
+                    <!-- Akan di-render oleh JS berdasarkan role -->
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Main View Content Area -->
+        <main id="main-content" class="flex-1 p-4 space-y-6">
+
+            <!-- TAB 1: HOME DASHBOARD -->
+            <section id="tab-home" class="space-y-6">
+                <!-- Search Input Bar -->
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="search-input" data-action="filter-menu" placeholder="Cari..."
+                        class="w-full bg-dark-card border border-dark-accent rounded-2xl py-3 pl-11 pr-10 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-inner">
+                    <button data-action="clear-search" id="clear-search-btn"
+                        class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Promo Hero Slider -->
+                <div
+                    class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-dark-card via-dark-accent to-dark-card border border-dark-accent/60 p-5 shadow-lg">
+                    <div
+                        class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
+                        <div class="space-y-2 max-w-xs">
+                            <span
+                                class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-primary/20 text-primary border border-primary/30">
+                                <i class="fa-solid fa-fire mr-1"></i> Promo Spesial Hari Ini
+                            </span>
+                            <h2 class="text-xl md:text-2xl font-extrabold text-white leading-tight">Diskon Kuliner <span
+                                    class="text-primary">Hingga 50%</span></h2>
+                            <p class="text-xs text-gray-300">Gunakan kode promo <span
+                                    class="font-mono text-primary font-bold">ANTIGRAVITY</span> saat checkout.</p>
+                            <button data-action="apply-promo" data-code="ANTIGRAVITY"
+                                class="mt-2 inline-flex items-center gap-2 bg-primary text-dark-bg font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-primary-dark transition shadow-glow pulse-btn">
+                                <i class="fa-solid fa-ticket"></i> Klaim Voucher Sekarang
+                            </button>
+                        </div>
+                        <div class="self-end md:self-center">
+                            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&auto=format&fit=crop&q=80"
+                                alt="Promo Food"
+                                class="w-28 h-28 md:w-36 md:h-36 object-cover rounded-2xl shadow-xl transform rotate-3 hover:rotate-0 transition duration-300">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Bar -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-base text-white flex items-center gap-2">
+                            <i class="fa-solid fa-list-ul text-primary"></i> Kategori Menu
+                        </h3>
+                    </div>
+                    <div id="categories-container" class="flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
+                        <!-- Tombol "Semua" tetap statis -->
+                        <button data-action="select-category" data-category="semua"
+                            class="category-card active flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-dark-card border border-dark-accent font-medium text-xs text-gray-200 transition-all duration-200">
+                            <i class="fa-solid fa-border-all text-primary text-sm"></i>
+                            <span>Semua</span>
+                        </button>
+                        <!-- Kategori dinamis dari database akan di-render di sini oleh JS -->
+                    </div>
+                </div>
+
+                <!-- Food Item Grid -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-base text-white flex items-center gap-2">
+                            <i class="fa-solid fa-fire-flame-curved text-primary"></i> Menu Populer
+                        </h3>
+                        <span data-action="select-category" data-category="semua"
+                            class="text-xs text-primary font-medium hover:underline cursor-pointer">Lihat Semua</span>
+                    </div>
+                    <div id="food-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3.5">
+                        <!-- Dynamic items generated via JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: CART & BAG PAGE -->
+            <section id="tab-cart" class="hidden space-y-5">
+                <div class="flex items-center justify-between border-b border-dark-accent pb-3">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-basket-shopping text-primary"></i> Keranjang Pesanan
+                    </h2>
+                    <button data-action="clear-cart" class="text-xs text-red-400 hover:text-red-300 font-medium">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Kosongkan
+                    </button>
+                </div>
+
+                <!-- Empty Cart State -->
+                <div id="cart-empty-view" class="text-center py-12 space-y-4">
+                    <div
+                        class="w-24 h-24 mx-auto rounded-full bg-dark-card flex items-center justify-center text-gray-500 text-4xl border border-dark-accent">
+                        <i class="fa-solid fa-burger opacity-40"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h4 class="font-bold text-base text-white">Keranjang Kamu Masih Kosong</h4>
+                        <p class="text-xs text-gray-400 max-w-xs mx-auto">Yuk cari makanan lezat dan tambahkan ke
+                            keranjang belanjaanmu!</p>
+                    </div>
+                    <button data-action="switch-tab" data-tab="home"
+                        class="bg-primary text-dark-bg text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-primary-dark transition inline-flex items-center gap-2">
+                        <i class="fa-solid fa-store"></i> Eksplor Menu Sekarang
+                    </button>
+                </div>
+
+                <!-- Filled Cart Items List -->
+                <div id="cart-filled-view" class="hidden space-y-4">
+                    <div id="cart-items-container" class="space-y-3">
+                        <!-- Dynamic Cart Rows -->
+                    </div>
+
+                    <!-- Voucher Promo Code -->
+                    <div class="bg-dark-card rounded-2xl p-3 border border-dark-accent flex items-center gap-2">
+                        <i class="fa-solid fa-ticket text-primary text-lg ml-1"></i>
+                        <input type="text" id="voucher-code-input" placeholder="Masukkan Kode Promo (cth: ANTIGRAVITY)"
+                            class="bg-transparent text-xs text-white placeholder-gray-400 flex-1 focus:outline-none uppercase font-mono">
+                        <button data-action="apply-voucher"
+                            class="bg-dark-accent text-primary text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-primary hover:text-dark-bg transition">
+                            Gunakan
+                        </button>
+                    </div>
+
+                    <!-- Order Summary Box -->
+                    <div class="bg-dark-card rounded-2xl p-4 border border-dark-accent space-y-2 text-xs">
+                        <h4 class="font-bold text-sm text-white mb-2 pb-2 border-b border-dark-accent/60">Rincian
+                            Pembayaran</h4>
+                        <div class="flex justify-between text-gray-300">
+                            <span>Subtotal Menu</span>
+                            <span id="summary-subtotal">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between text-gray-300">
+                            <span>Ongkos Kirim</span>
+                            <span id="summary-shipping">Rp 10.000</span>
+                        </div>
+                        <div class="flex justify-between text-gray-300">
+                            <span>Biaya Layanan & Aplikasi</span>
+                            <span>Rp 2.000</span>
+                        </div>
+                        <div id="summary-discount-row" class="hidden flex justify-between text-green-400 font-medium">
+                            <span>Diskon Voucher</span>
+                            <span id="summary-discount">-Rp 0</span>
+                        </div>
+                        <div
+                            class="border-t border-dark-accent pt-2.5 flex justify-between text-sm font-bold text-white">
+                            <span>Total Tagihan</span>
+                            <span id="summary-total" class="text-primary text-base">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <button data-action="open-checkout"
+                        class="w-full bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3.5 rounded-2xl transition shadow-glow flex items-center justify-center gap-2 text-sm">
+                        <span>Lanjut ke Pembayaran</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- TAB 3: ORDERS HISTORY -->
+            <section id="tab-orders" class="hidden space-y-4">
+                <div class="flex items-center justify-between border-b border-dark-accent pb-3">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-primary"></i> Riwayat Pesanan
+                    </h2>
+                    <span class="text-xs text-gray-400" id="active-orders-count">1 Pesanan Aktif</span>
+                </div>
+                <div id="orders-list-container" class="space-y-3">
+                    <!-- Dynamic orders list -->
+                </div>
+            </section>
+
+            <!-- TAB 4: FAVORITES PAGE -->
+            <section id="tab-favorites" class="hidden space-y-4">
+                <div class="flex items-center justify-between border-b border-dark-accent pb-3">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-heart text-red-500"></i> Menu Favorit Saya
+                    </h2>
+                </div>
+                <div id="favorites-grid" class="grid grid-cols-2 gap-3.5">
+                    <!-- Dynamic Favorites items -->
+                </div>
+                <div id="favorites-empty" class="hidden text-center py-12 space-y-3">
+                    <i class="fa-regular fa-heart text-5xl text-gray-500"></i>
+                    <p class="text-sm text-gray-400">Belum ada menu favorit yang disimpan.</p>
+                </div>
+            </section>
+
+            <!-- TAB 5: PROFILE & ACCOUNT -->
+            <section id="tab-profile" class="hidden space-y-5">
+
+                <!-- Guest View -->
+                <div id="profile-guest-view" class="hidden space-y-5">
+                    <div class="bg-dark-card rounded-3xl p-6 border border-dark-accent text-center">
+                        <div
+                            class="w-20 h-20 rounded-full bg-dark-accent flex items-center justify-center mx-auto mb-3">
+                            <i class="fa-solid fa-user-secret text-3xl text-gray-400"></i>
+                        </div>
+                        <h3 class="font-bold text-base text-white">Mode Tamu (Non-Member)</h3>
+                        <p class="text-xs text-gray-400 mt-1">Kamu belum login. Data pesanan hanya tersimpan sementara
+                            di perangkat ini.</p>
+                        <a href="login.html"
+                            class="mt-4 inline-flex items-center gap-2 bg-primary text-dark-bg font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-primary-dark transition">
+                            <i class="fa-solid fa-right-to-bracket"></i> Masuk / Daftar untuk Fitur Lengkap
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Member View (DINAMIS) -->
+                <div id="profile-member-view" class="hidden space-y-5">
+                    <!-- Profile Card -->
+                    <div
+                        class="bg-dark-card rounded-3xl p-5 border border-dark-accent text-center relative overflow-hidden">
+                        <div class="absolute -right-8 -top-8 w-28 h-28 bg-primary/10 rounded-full blur-xl"></div>
+                        <div class="relative">
+                            <!-- ✅ AVATAR DINAMIS (Foto atau Initial) -->
+                            <div id="profile-avatar-circle"
+                                class="w-20 h-20 rounded-full mx-auto mb-3 bg-primary/20 border-2 border-primary flex items-center justify-center text-primary font-bold text-2xl shadow-glow overflow-hidden">
+                                <span id="profile-avatar-initial">U</span>
+                                <img id="profile-avatar-img" src="" alt="Avatar"
+                                    class="hidden w-full h-full object-cover">
+                            </div>
+                            <button data-action="open-edit-profile"
+                                class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-primary text-dark-bg w-8 h-8 rounded-full flex items-center justify-center shadow-glow hover:bg-primary-dark transition">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                        </div>
+                        <h3 id="profile-name" class="font-bold text-base text-white mt-2">Loading...</h3>
+                        <p id="profile-email" class="text-xs text-gray-400">Loading...</p>
+                        <p id="profile-phone" class="text-xs text-gray-400 mt-0.5"></p>
+                        <div
+                            class="mt-4 inline-flex items-center gap-2 bg-dark-bg px-3 py-1.5 rounded-full border border-dark-accent text-xs">
+                            <i class="fa-solid fa-crown text-primary"></i>
+                            <span class="text-gray-200 font-semibold">Member</span>
+                        </div>
+                    </div>
+
+                    <!-- Menu Links -->
+                    <div class="bg-dark-card rounded-2xl border border-dark-accent divide-y divide-dark-accent text-xs">
+                        <div data-action="open-addresses"
+                            class="p-3.5 flex items-center justify-between hover:bg-dark-accent/40 cursor-pointer transition">
+                            <div class="flex items-center gap-3 text-gray-200">
+                                <i class="fa-solid fa-location-dot text-primary text-base w-5 text-center"></i>
+                                <span>Daftar Alamat Pengiriman</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="address-count-badge"
+                                    class="bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                                <i class="fa-solid fa-chevron-right text-gray-500"></i>
+                            </div>
+                        </div>
+                        <div data-action="open-edit-profile"
+                            class="p-3.5 flex items-center justify-between hover:bg-dark-accent/40 cursor-pointer transition">
+                            <div class="flex items-center gap-3 text-gray-200">
+                                <i class="fa-solid fa-user-pen text-primary text-base w-5 text-center"></i>
+                                <span>Edit Profil Saya</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-500"></i>
+                        </div>
+                        <div data-action="open-change-password"
+                            class="p-3.5 flex items-center justify-between hover:bg-dark-accent/40 cursor-pointer transition">
+                            <div class="flex items-center gap-3 text-gray-200">
+                                <i class="fa-solid fa-key text-primary text-base w-5 text-center"></i>
+                                <span>Ubah Password</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-500"></i>
+                        </div>
+                        <div
+                            class="p-3.5 flex items-center justify-between hover:bg-dark-accent/40 cursor-pointer transition">
+                            <div class="flex items-center gap-3 text-gray-200">
+                                <i class="fa-solid fa-wallet text-primary text-base w-5 text-center"></i>
+                                <span>Metode Pembayaran</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-500"></i>
+                        </div>
+                        <div
+                            class="p-3.5 flex items-center justify-between hover:bg-dark-accent/40 cursor-pointer transition">
+                            <div class="flex items-center gap-3 text-gray-200">
+                                <i class="fa-solid fa-ticket text-primary text-base w-5 text-center"></i>
+                                <span>Voucher Saya</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-500"></i>
+                        </div>
+                    </div>
+
+                    <button data-action="logout"
+                        class="w-full bg-red-500/20 hover:bg-red-500/30 text-red-400 font-bold py-3 rounded-2xl border border-red-500/30 transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                    </button>
+                </div>
+
+                <!-- Admin View -->
+                <div id="profile-admin-view" class="hidden space-y-5">
+                    <div
+                        class="bg-dark-card rounded-3xl p-5 border border-primary/30 text-center relative overflow-hidden">
+                        <div class="absolute -right-8 -top-8 w-28 h-28 bg-primary/20 rounded-full blur-xl"></div>
+                        <div
+                            class="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-3 border-2 border-primary">
+                            <i class="fa-solid fa-shield-halved text-3xl text-primary"></i>
+                        </div>
+                        <h3 id="admin-name" class="font-bold text-base text-white">Admin</h3>
+                        <p id="admin-email" class="text-xs text-gray-400">Loading...</p>
+                        <div
+                            class="mt-4 inline-flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full border border-primary/30 text-xs">
+                            <i class="fa-solid fa-crown text-primary"></i>
+                            <span class="text-primary font-bold">ADMIN</span>
+                        </div>
+                    </div>
+                    <a href="admin.html"
+                        class="block w-full bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3 rounded-2xl transition text-sm text-center">
+                        <i class="fa-solid fa-gear mr-2"></i> Buka Admin Panel
+                    </a>
+                    <button data-action="logout"
+                        class="w-full bg-red-500/20 hover:bg-red-500/30 text-red-400 font-bold py-3 rounded-2xl border border-red-500/30 transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Floating Quick Cart Strip -->
+        <div id="floating-cart-bar" class="hidden fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-30">
+            <div data-action="switch-tab" data-tab="cart"
+                class="bg-primary text-dark-bg p-3.5 rounded-2xl shadow-glow flex items-center justify-between cursor-pointer hover:bg-primary-dark transition">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-dark-bg text-primary font-bold text-xs flex items-center justify-center"
+                        id="floating-cart-count">0</div>
+                    <div>
+                        <p class="text-[10px] font-semibold uppercase text-dark-bg/80 leading-none">Total Pesanan</p>
+                        <p class="text-sm font-extrabold leading-tight" id="floating-cart-total">Rp 0</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 font-bold text-xs">
+                    <span>Lihat Keranjang</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Mobile Navigation Bar -->
+        <nav
+            class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-4xl glass-nav z-40 px-3 py-2 border-t border-dark-accent">
+            <div class="grid grid-cols-5 text-center">
+                <button data-action="switch-tab" data-tab="home" id="nav-home"
+                    class="nav-btn py-1 flex flex-col items-center justify-center text-primary">
+                    <i class="fa-solid fa-house text-lg mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Beranda</span>
+                </button>
+                <button data-action="switch-tab-menu" id="nav-menu"
+                    class="nav-btn py-1 flex flex-col items-center justify-center text-gray-400 hover:text-primary transition">
+                    <i class="fa-solid fa-utensils text-lg mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Menu</span>
+                </button>
+                <button data-action="switch-tab" data-tab="orders" id="nav-orders"
+                    class="nav-btn py-1 flex flex-col items-center justify-center text-gray-400 hover:text-primary transition relative">
+                    <i class="fa-solid fa-receipt text-lg mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Pesanan</span>
+                    <span id="order-dot"
+                        class="absolute top-1 right-5 w-2 h-2 bg-primary rounded-full animate-ping"></span>
+                </button>
+                <button data-action="switch-tab" data-tab="favorites" id="nav-favorites"
+                    class="nav-btn py-1 flex flex-col items-center justify-center text-gray-400 hover:text-primary transition">
+                    <i class="fa-solid fa-heart text-lg mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Favorit</span>
+                </button>
+                <button data-action="switch-tab" data-tab="profile" id="nav-profile"
+                    class="nav-btn py-1 flex flex-col items-center justify-center text-gray-400 hover:text-primary transition">
+                    <i class="fa-solid fa-user text-lg mb-0.5"></i>
+                    <span class="text-[10px] font-medium">Akun</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- FOOD DETAIL MODAL -->
+        <div id="food-detail-modal"
+            class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div
+                class="bg-dark-card w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden border border-dark-accent max-h-[90vh] flex flex-col animation-slide-up">
+                <div class="relative h-56 bg-dark-accent">
+                    <img id="modal-food-img" src="" alt="Food" class="w-full h-full object-cover">
+                    <button data-action="close-food-modal"
+                        class="absolute top-4 right-4 w-9 h-9 rounded-full bg-dark-bg/80 text-white flex items-center justify-center hover:bg-dark-bg transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <span id="modal-food-badge"
+                        class="absolute bottom-3 left-4 bg-primary text-dark-bg font-bold text-[10px] px-2.5 py-1 rounded-full uppercase">
+                        Terlaris
+                    </span>
+                </div>
+                <div class="p-5 flex-1 overflow-y-auto space-y-4 text-xs">
+                    <div>
+                        <div class="flex items-start justify-between gap-2">
+                            <h3 id="modal-food-title" class="text-lg font-bold text-white">Nama Makanan</h3>
+                            <span id="modal-food-price" class="text-base font-extrabold text-primary">Rp 0</span>
+                        </div>
+                        <p id="modal-food-desc" class="text-gray-300 mt-1 leading-relaxed">Deskripsi makanan lezat dan
+                            higienis.</p>
+                    </div>
+
+                    <!-- Options: Variasi Dinamis dari Database -->
+                    <div id="modal-variations-container" class="space-y-4 pt-2 border-t border-dark-accent">
+                        <!-- Akan di-render oleh JavaScript -->
+                    </div>
+
+                    <!-- Special Request Notes -->
+                    <div class="space-y-1.5 pt-2 border-t border-dark-accent">
+                        <label class="font-bold text-white block">Catatan Khusus (Opsional):</label>
+                        <input type="text" id="modal-food-notes"
+                            placeholder="Contoh: Pisahkan kuah, jangan pakai bawang goreng..."
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl p-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-primary">
+                    </div>
+
+                    <!-- Total Harga Dinamis -->
+                    <div class="pt-2 border-t border-dark-accent flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Total Harga:</span>
+                        <span id="modal-total-price" class="text-base font-extrabold text-primary">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- Footer Counter & Add Action -->
+                <div class="p-4 bg-dark-bg border-t border-dark-accent flex items-center gap-3">
+                    <div class="flex items-center bg-dark-card border border-dark-accent rounded-xl p-1">
+                        <button data-action="adjust-qty" data-delta="-1"
+                            class="w-8 h-8 rounded-lg bg-dark-accent text-white flex items-center justify-center font-bold hover:bg-primary hover:text-dark-bg transition">
+                            <i class="fa-solid fa-minus text-xs"></i>
+                        </button>
+                        <span id="modal-qty" class="w-10 text-center font-bold text-white text-sm">1</span>
+                        <button data-action="adjust-qty" data-delta="1"
+                            class="w-8 h-8 rounded-lg bg-dark-accent text-white flex items-center justify-center font-bold hover:bg-primary hover:text-dark-bg transition">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                    <button data-action="confirm-add-cart"
+                        class="flex-1 bg-primary text-dark-bg font-bold py-3 rounded-xl hover:bg-primary-dark transition flex items-center justify-center gap-2 shadow-glow">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span>Tambah ke Keranjang</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHECKOUT MODAL -->
+        <div id="checkout-modal"
+            class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div
+                class="bg-dark-card w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden border border-dark-accent max-h-[92vh] flex flex-col">
+                <div class="p-4 bg-dark-bg border-b border-dark-accent flex items-center justify-between">
+                    <h3 class="font-bold text-base text-white flex items-center gap-2">
+                        <i class="fa-solid fa-shield-halved text-primary"></i> Konfirmasi Checkout
+                    </h3>
+                    <button data-action="close-checkout" class="text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                <div class="p-5 flex-1 overflow-y-auto space-y-4 text-xs">
+                    <!-- Address Selection -->
+                    <div class="bg-dark-bg rounded-2xl p-3 border border-dark-accent space-y-1">
+                        <div class="flex items-center justify-between text-gray-400">
+                            <span class="font-semibold"><i class="fa-solid fa-location-dot text-primary mr-1"></i>
+                                Alamat Pengantaran</span>
+                            <button data-action="change-location"
+                                class="text-primary hover:underline font-medium">Ubah</button>
+                        </div>
+                        <p class="font-bold text-white text-sm">Rumah - Sarah Amalia</p>
+                        <p class="text-gray-300">Jl. Sudirman No. 45, Kebayoran Baru, Jakarta Selatan (Dekat Patung
+                            Pemuda)</p>
+                    </div>
+
+                    <!-- Payment Method Selection -->
+                    <div class="space-y-2">
+                        <label class="font-bold text-white block">Pilih Metode Pembayaran:</label>
+                        <div class="space-y-2">
+                            <label
+                                class="payment-option flex items-center justify-between p-3 rounded-2xl bg-dark-bg border-2 border-primary cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-qrcode text-base"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-white">QRIS (GoPay, OVO, ShopeePay, Dana)</p>
+                                        <p class="text-[10px] text-gray-400">Bebas biaya admin & konfirmasi instan</p>
+                                    </div>
+                                </div>
+                                <input type="radio" name="payment" value="QRIS" checked class="accent-primary">
+                            </label>
+                            <label
+                                class="payment-option flex items-center justify-between p-3 rounded-2xl bg-dark-bg border border-dark-accent cursor-pointer hover:border-primary/50">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-money-bill-wave text-base"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-white">Bayar di Tempat (COD)</p>
+                                        <p class="text-[10px] text-gray-400">Bayar tunai kepada kurir saat makanan tiba
+                                        </p>
+                                    </div>
+                                </div>
+                                <input type="radio" name="payment" value="COD" class="accent-primary">
+                            </label>
+                            <label
+                                class="payment-option flex items-center justify-between p-3 rounded-2xl bg-dark-bg border border-dark-accent cursor-pointer hover:border-primary/50">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-credit-card text-base"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-white">Kartu Kredit / Debit</p>
+                                        <p class="text-[10px] text-gray-400">Visa, Mastercard, JCB</p>
+                                    </div>
+                                </div>
+                                <input type="radio" name="payment" value="KARTU" class="accent-primary">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Final Cost Summary -->
+                    <div class="bg-dark-bg rounded-2xl p-3 border border-dark-accent space-y-1">
+                        <div class="flex justify-between text-gray-300">
+                            <span>Total Item</span>
+                            <span id="checkout-items-count">0 Porsi</span>
+                        </div>
+                        <div class="flex justify-between text-gray-300">
+                            <span>Ongkir + Layanan</span>
+                            <span>Rp 12.000</span>
+                        </div>
+                        <div class="flex justify-between font-bold text-white text-sm pt-1 border-t border-dark-accent">
+                            <span>Total Pembayaran</span>
+                            <span id="checkout-final-total" class="text-primary">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-dark-bg border-t border-dark-accent">
+                    <button data-action="process-order"
+                        class="w-full bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3.5 rounded-2xl transition shadow-glow flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Buat Pesanan Sekarang</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIVE ORDER TRACKER MODAL -->
+        <div id="tracker-modal"
+            class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div
+                class="bg-dark-card w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden border border-dark-accent p-5 space-y-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] uppercase font-bold text-primary tracking-wider">Status Live
+                            Tracking</span>
+                        <h3 class="text-base font-bold text-white">Pesanan #AG-8942</h3>
+                    </div>
+                    <button data-action="close-tracker"
+                        class="w-8 h-8 rounded-full bg-dark-bg text-gray-400 hover:text-white flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Courier Card -->
+                <div class="bg-dark-bg rounded-2xl p-3.5 border border-dark-accent flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
+                                alt="Driver" class="w-12 h-12 rounded-full object-cover border border-primary">
+                            <span
+                                class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-dark-bg"></span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-white">Budi Santoso</h4>
+                            <p class="text-[11px] text-gray-400"><i
+                                    class="fa-solid fa-motorcycle text-primary mr-1"></i> Honda Vario • B 4591 SKT</p>
+                        </div>
+                    </div>
+                    <button data-action="simulate-call"
+                        class="w-10 h-10 rounded-full bg-primary/20 text-primary hover:bg-primary hover:text-dark-bg flex items-center justify-center transition">
+                        <i class="fa-solid fa-phone"></i>
+                    </button>
+                </div>
+
+                <!-- Tracker Steps -->
+                <div class="space-y-4 py-2 relative pl-6 border-l-2 border-dark-accent ml-3">
+                    <div class="relative">
+                        <div
+                            class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-green-500 ring-4 ring-dark-card">
+                        </div>
+                        <p class="text-xs font-bold text-white">Pesanan Diterima Restoran</p>
+                        <p class="text-[10px] text-gray-400">Restoran sedang menyiapkan hidanganmu</p>
+                    </div>
+                    <div class="relative">
+                        <div id="step-cook"
+                            class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-primary ring-4 ring-dark-card animate-pulse">
+                        </div>
+                        <p class="text-xs font-bold text-white">Makanan Sedang Dimasak</p>
+                        <p class="text-[10px] text-gray-400">Estimasi waktu penyajian: ~10 Menit</p>
+                    </div>
+                    <div class="relative">
+                        <div id="step-deliver"
+                            class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-gray-600 ring-4 ring-dark-card">
+                        </div>
+                        <p class="text-xs font-bold text-gray-400">Kurir Mengantar Pesanan</p>
+                        <p class="text-[10px] text-gray-500">Menuju alamat lokasi Anda</p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-primary/10 border border-primary/30 rounded-2xl p-3 flex items-center justify-between text-xs">
+                    <span class="text-gray-300">Estimasi Tiba:</span>
+                    <span class="font-extrabold text-primary text-sm"><i class="fa-regular fa-clock mr-1"></i> 15 - 20
+                        Menit</span>
+                </div>
+
+                <button data-action="close-tracker"
+                    class="w-full bg-dark-accent hover:bg-dark-accent/80 text-white font-bold py-3 rounded-xl text-xs transition">
+                    Tutup & Pantau Nanti
+                </button>
+            </div>
+        </div>
+
+        <!-- LOGOUT CONFIRMATION MODAL -->
+        <div id="logout-modal"
+            class="hidden fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+            <div
+                class="bg-dark-card w-full max-w-sm rounded-3xl border border-dark-accent overflow-hidden shadow-2xl animate-slide-up">
+
+                <!-- Header Icon -->
+                <div class="pt-8 pb-4 text-center">
+                    <div
+                        class="w-16 h-16 mx-auto rounded-full bg-red-500/15 border-2 border-red-500/30 flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-right-from-bracket text-2xl text-red-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Keluar dari Akun?</h3>
+                    <p class="text-xs text-gray-400 mt-2 px-6 leading-relaxed">
+                        Anda perlu login kembali untuk mengakses fitur lengkap seperti riwayat pesanan, favorit, dan
+                        tracking real-time.
+                    </p>
+                </div>
+
+                <!-- Info Box (Hanya muncul untuk member/admin) -->
+                <div class="mx-5 mb-4 bg-dark-bg/60 rounded-2xl p-3 border border-dark-accent flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-primary mt-0.5"></i>
+                    <div class="text-[11px] text-gray-300 leading-relaxed">
+                        <span class="font-semibold text-white">Keranjang belanja</span> Anda saat ini akan tetap
+                        tersimpan dan bisa dilanjutkan setelah login kembali.
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="p-5 pt-2 grid grid-cols-2 gap-3">
+                    <button data-action="cancel-logout"
+                        class="bg-dark-bg hover:bg-dark-accent border border-dark-accent text-gray-200 font-bold py-3 rounded-xl transition text-sm">
+                        <i class="fa-solid fa-xmark mr-1"></i> Batal
+                    </button>
+                    <button data-action="confirm-logout"
+                        class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-red-500/20">
+                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Ya, Keluar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- MODAL EDIT PROFILE -->
+        <!-- ============================================ -->
+        <div id="edit-profile-modal"
+            class="hidden fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+            <!-- Child pertama = content modal -->
+            <div
+                class="bg-dark-card w-full max-w-md rounded-3xl border border-dark-accent overflow-hidden shadow-2xl animate-slide-up max-h-[90vh] flex flex-col">
+                <div class="p-5 border-b border-dark-accent flex items-center justify-between flex-shrink-0">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-user-pen text-primary"></i> Edit Profil
+                    </h3>
+                    <button data-action="close-edit-profile"
+                        class="w-8 h-8 rounded-full bg-dark-bg text-gray-400 hover:text-white flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <form id="edit-profile-form" class="p-5 space-y-4 overflow-y-auto flex-1">
+
+                    <!-- ✅ FOTO PROFIL (BARU) -->
+                    <div class="flex flex-col items-center gap-3 pb-4 border-b border-dark-accent">
+                        <div class="relative group">
+                            <div id="avatar-preview-wrapper"
+                                class="w-24 h-24 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center text-primary font-bold text-3xl overflow-hidden shadow-glow">
+                                <span id="avatar-initial">U</span>
+                                <img id="avatar-preview" src="" alt="Preview" class="hidden w-full h-full object-cover">
+                            </div>
+                            <label for="avatar-input"
+                                class="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-primary text-dark-bg flex items-center justify-center cursor-pointer shadow-glow hover:bg-primary-dark transition">
+                                <i class="fa-solid fa-camera text-sm"></i>
+                            </label>
+                            <button type="button" id="remove-avatar-btn"
+                                class="hidden absolute -top-1 -right-1 w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
+                        </div>
+                        <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/webp" class="hidden">
+                        <div class="text-center">
+                            <p class="text-xs text-gray-400">Klik icon kamera untuk ganti foto</p>
+                            <p class="text-[10px] text-gray-500 mt-0.5">JPG, PNG, atau WebP • Maks 2MB • Auto-compress
+                            </p>
+                        </div>
+                        <div id="avatar-upload-status" class="hidden text-xs text-center"></div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Nama Lengkap</label>
+                        <input type="text" id="edit-profile-name" required
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Email <span
+                                class="text-gray-500">(tidak bisa diubah)</span></label>
+                        <input type="email" id="edit-profile-email" disabled
+                            class="w-full bg-dark-bg/50 border border-dark-accent rounded-xl p-3 text-sm text-gray-500 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">No. HP</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">+62</span>
+                            <input type="text" id="edit-profile-phone" placeholder="8123456789" inputmode="numeric"
+                                maxlength="13"
+                                class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 pl-12 text-sm text-white focus:outline-none focus:border-primary">
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-1">
+                            <i class="fa-solid fa-circle-info mr-1"></i>
+                            Hanya angka, tanpa awalan 0. Contoh: 8123456789
+                        </p>
+                    </div>
+                    <div class="flex items-center justify-end gap-3 pt-2">
+                        <button type="button" data-action="close-edit-profile"
+                            class="bg-dark-bg hover:bg-dark-accent border border-dark-accent text-gray-200 font-bold py-3 px-6 rounded-xl transition text-sm">
+                            Batal
+                        </button>
+                        <button type="submit" id="save-profile-btn"
+                            class="bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3 px-6 rounded-xl transition text-sm">
+                            <i class="fa-solid fa-save mr-1"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- MODAL UBAH PASSWORD -->
+        <!-- ============================================ -->
+        <div id="change-password-modal"
+            class="hidden fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+            <div
+                class="bg-dark-card w-full max-w-md rounded-3xl border border-dark-accent overflow-hidden shadow-2xl animate-slide-up">
+                <div class="p-5 border-b border-dark-accent flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-key text-primary"></i> Ubah Password
+                    </h3>
+                    <button data-action="close-change-password"
+                        class="w-8 h-8 rounded-full bg-dark-bg text-gray-400 hover:text-white flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <form id="change-password-form" class="p-5 space-y-4">
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Password Lama</label>
+                        <input type="password" id="current-password" required minlength="6"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Password Baru</label>
+                        <input type="password" id="new-password" required minlength="6"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary">
+                        <p class="text-[10px] text-gray-500 mt-1">Minimal 6 karakter</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Konfirmasi Password Baru</label>
+                        <input type="password" id="confirm-password" required minlength="6"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary">
+                    </div>
+                    <div class="flex items-center justify-end gap-3 pt-2">
+                        <button type="button" data-action="close-change-password"
+                            class="bg-dark-bg hover:bg-dark-accent border border-dark-accent text-gray-200 font-bold py-3 px-6 rounded-xl transition text-sm">
+                            Batal
+                        </button>
+                        <button type="submit"
+                            class="bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3 px-6 rounded-xl transition text-sm">
+                            <i class="fa-solid fa-check mr-1"></i> Ubah Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- MODAL DAFTAR ALAMAT -->
+        <!-- ============================================ -->
+        <div id="addresses-modal"
+            class="hidden fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+            <div
+                class="bg-dark-card w-full max-w-lg rounded-3xl border border-dark-accent overflow-hidden shadow-2xl animate-slide-up max-h-[90vh] flex flex-col">
+                <div class="p-5 border-b border-dark-accent flex items-center justify-between flex-shrink-0">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-primary"></i> Alamat Pengiriman
+                    </h3>
+                    <button data-action="close-addresses"
+                        class="w-8 h-8 rounded-full bg-dark-bg text-gray-400 hover:text-white flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="p-5 overflow-y-auto flex-1">
+                    <button data-action="open-add-address"
+                        class="w-full mb-4 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Tambah Alamat Baru
+                    </button>
+
+                    <div id="addresses-list" class="space-y-3">
+                        <p class="text-center text-gray-500 py-8 text-sm">Memuat alamat...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- MODAL TAMBAH/EDIT ALAMAT -->
+        <!-- ============================================ -->
+        <div id="address-form-modal"
+            class="hidden fixed inset-0 z-[70] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+            <div
+                class="bg-dark-card w-full max-w-md rounded-3xl border border-dark-accent overflow-hidden shadow-2xl animate-slide-up max-h-[90vh] flex flex-col">
+                <div class="p-5 border-b border-dark-accent flex items-center justify-between flex-shrink-0">
+                    <h3 id="address-form-title" class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle text-primary"></i>
+                        <span>Tambah Alamat</span>
+                    </h3>
+                    <button data-action="close-address-form"
+                        class="w-8 h-8 rounded-full bg-dark-bg text-gray-400 hover:text-white flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <form id="address-form" class="p-5 overflow-y-auto flex-1 space-y-3">
+                    <input type="hidden" id="address-id">
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Label Alamat</label>
+                        <div class="flex gap-2">
+                            <button type="button" data-label="Rumah"
+                                class="label-btn flex-1 py-2 rounded-xl border border-dark-accent bg-dark-bg text-gray-300 text-xs font-medium transition">
+                                <i class="fa-solid fa-house mr-1"></i> Rumah
+                            </button>
+                            <button type="button" data-label="Kantor"
+                                class="label-btn flex-1 py-2 rounded-xl border border-dark-accent bg-dark-bg text-gray-300 text-xs font-medium transition">
+                                <i class="fa-solid fa-briefcase mr-1"></i> Kantor
+                            </button>
+                            <button type="button" data-label="Lainnya"
+                                class="label-btn flex-1 py-2 rounded-xl border border-dark-accent bg-dark-bg text-gray-300 text-xs font-medium transition">
+                                <i class="fa-solid fa-ellipsis mr-1"></i> Lainnya
+                            </button>
+                        </div>
+                        <input type="hidden" id="address-label" value="Rumah" required>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-semibold text-gray-300 mb-1 block">Nama Penerima</label>
+                            <input type="text" id="address-recipient" required
+                                class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-gray-300 mb-1 block">No. HP</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">+62</span>
+                                <input type="text" id="address-phone" placeholder="8123456789" inputmode="numeric"
+                                    maxlength="13" required
+                                    class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 pl-12 text-sm text-white focus:outline-none focus:border-primary">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Alamat Lengkap</label>
+                        <textarea id="address-detail" rows="2" required
+                            placeholder="Nama jalan, nomor rumah, RT/RW, dll"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary resize-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-semibold text-gray-300 mb-1 block">Kode Pos</label>
+                            <input type="text" id="address-postal" placeholder="12345" maxlength="5"
+                                class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-gray-300 mb-1 block">Kota</label>
+                            <input type="text" id="address-city" placeholder="Jakarta Selatan"
+                                class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Patokan / Catatan
+                            (Opsional)</label>
+                        <input type="text" id="address-notes" placeholder="Dekat minimarket, pagar hitam, dll"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary">
+                    </div>
+
+                    <label
+                        class="flex items-center gap-2 p-3 bg-dark-bg rounded-xl border border-dark-accent cursor-pointer">
+                        <input type="checkbox" id="address-primary" class="accent-primary w-4 h-4">
+                        <span class="text-xs text-gray-200">Jadikan alamat utama</span>
+                    </label>
+                </form>
+
+                <div class="p-5 border-t border-dark-accent flex items-center justify-end gap-3 flex-shrink-0">
+                    <button type="button" data-action="close-address-form"
+                        class="bg-dark-bg hover:bg-dark-accent border border-dark-accent text-gray-200 font-bold py-3 px-6 rounded-xl transition text-sm">
+                        Batal
+                    </button>
+                    <button type="button" data-action="save-address"
+                        class="bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3 px-6 rounded-xl transition text-sm">
+                        <i class="fa-solid fa-save mr-1"></i> Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NOTIFICATION TOAST MESSAGES CONTAINER -->
+        <div id="toast-container"
+            class="fixed top-16 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs space-y-2 pointer-events-none px-4">
+        </div>
+
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/data.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/supabase-config.js"></script>
+    <script type="module" src="js/supabase-service.js"></script>
+</body>
+
+</html>

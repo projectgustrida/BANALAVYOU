@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Antigravity Food</title>
+    <link rel="icon" href="data:,">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FFBF1E',
+                        'primary-dark': '#e6a80d',
+                        'dark-bg': '#261A16',
+                        'dark-card': '#382112',
+                        'dark-accent': '#593720',
+                    },
+                    fontFamily: { poppins: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slide-in-right {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slide-out-right {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fade-in 0.2s ease-out;
+        }
+
+        .animate-slide-up {
+            animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .animate-slide-in-right {
+            animation: slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .animate-slide-out-right {
+            animation: slide-out-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Tab Active State */
+        .tab-btn.active {
+            color: #FFBF1E;
+            border-bottom: 2px solid #FFBF1E;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-dark-bg text-white flex flex-col">
+
+    <!-- ============================================ -->
+    <!-- HEADER & NAVIGASI -->
+    <!-- ============================================ -->
+    <header class="bg-dark-card border-b border-dark-accent sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <!-- Logo & Title -->
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-dark-bg font-bold text-xl">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-extrabold">Admin Panel</h1>
+                        <p class="text-xs text-gray-400">Kelola aplikasi Antigravity Food</p>
+                    </div>
+                </div>
+
+                <!-- Top Actions -->
+                <div class="flex items-center gap-3">
+                    <a href="index.html"
+                        class="text-xs text-gray-400 hover:text-primary transition flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-left"></i> Ke Aplikasi
+                    </a>
+                    <button id="btn-logout"
+                        class="bg-red-500/20 text-red-400 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-500/30 transition flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex items-center gap-6 mt-6 border-t border-dark-accent pt-2 overflow-x-auto no-scrollbar">
+                <button data-tab="dashboard"
+                    class="tab-btn active pb-3 text-sm font-semibold text-gray-400 hover:text-primary transition whitespace-nowrap">
+                    <i class="fa-solid fa-chart-pie mr-1"></i> Dashboard
+                </button>
+                <button data-tab="menu"
+                    class="tab-btn pb-3 text-sm font-semibold text-gray-400 hover:text-primary transition whitespace-nowrap">
+                    <i class="fa-solid fa-utensils mr-1"></i> Kelola Menu
+                </button>
+                <button data-tab="variasi"
+                    class="tab-btn pb-3 text-sm font-semibold text-gray-400 hover:text-primary transition whitespace-nowrap">
+                    <i class="fa-solid fa-sliders mr-1"></i> Kelola Variasi
+                </button>
+                <button data-tab="kategori"
+                    class="tab-btn pb-3 text-sm font-semibold text-gray-400 hover:text-primary transition whitespace-nowrap">
+                    <i class="fa-solid fa-tags mr-1"></i> Kelola Kategori
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================ -->
+    <!-- MAIN CONTENT AREA -->
+    <!-- ============================================ -->
+    <main class="flex-1 max-w-6xl mx-auto w-full p-4 md:p-6 space-y-6">
+
+        <!-- VIEW 1: DASHBOARD (STATS) -->
+        <div id="view-dashboard" class="view-section space-y-6">
+            <h2 class="text-xl font-bold text-white mb-4">Ringkasan Aplikasi</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-dark-card rounded-2xl p-5 border border-dark-accent">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary"><i
+                                class="fa-solid fa-utensils"></i></div>
+                        <p class="text-xs text-gray-400">Total Menu Aktif</p>
+                    </div>
+                    <p id="stat-menu" class="text-3xl font-extrabold text-white">0</p>
+                </div>
+                <div class="bg-dark-card rounded-2xl p-5 border border-dark-accent">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+                            <i class="fa-solid fa-tags"></i>
+                        </div>
+                        <p class="text-xs text-gray-400">Total Kategori</p>
+                    </div>
+                    <p id="stat-kategori" class="text-3xl font-extrabold text-white">0</p>
+                </div>
+                <div class="bg-dark-card rounded-2xl p-5 border border-dark-accent">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <p class="text-xs text-gray-400">Total Member</p>
+                    </div>
+                    <p id="stat-members" class="text-3xl font-extrabold text-white">0</p>
+                </div>
+                <div class="bg-dark-card rounded-2xl p-5 border border-dark-accent">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <p class="text-xs text-gray-400">Pendapatan</p>
+                    </div>
+                    <p id="stat-revenue" class="text-2xl font-extrabold text-white">Rp 0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: KELOLA MENU -->
+        <div id="view-menu" class="view-section hidden space-y-6">
+
+            <!-- Header dengan Tombol Tambah -->
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-utensils text-primary"></i> Daftar Menu
+                </h2>
+                <button id="btn-open-add-menu"
+                    class="bg-primary hover:bg-primary-dark text-dark-bg font-bold py-2.5 px-5 rounded-xl transition text-sm flex items-center gap-2 shadow-glow">
+                    <i class="fa-solid fa-plus"></i> Tambah Menu Baru
+                </button>
+            </div>
+
+            <!-- Daftar Menu -->
+            <div class="bg-dark-card rounded-2xl p-6 border border-dark-accent">
+                <div id="menu-list" class="space-y-3">
+                    <p class="text-gray-500 text-center py-8">Memuat data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: KELOLA KATEGORI -->
+        <div id="view-kategori" class="view-section hidden space-y-6">
+            <!-- Form Tambah Kategori -->
+            <div class="bg-dark-card rounded-2xl p-6 border border-dark-accent">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2"><i
+                        class="fa-solid fa-plus-circle text-primary"></i> Tambah Kategori Baru</h2>
+                <form id="category-form" class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+                    <input type="text" id="cat-name" placeholder="Nama Kategori" required
+                        class="bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                    <input type="text" id="cat-icon" placeholder="Icon (cth: fa-solid fa-pizza-slice)"
+                        value="fa-solid fa-utensils"
+                        class="bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                    <input type="number" id="cat-order" placeholder="Urutan" value="0" min="0"
+                        class="bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                    <button type="submit"
+                        class="bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3 rounded-xl transition text-sm"><i
+                            class="fa-solid fa-plus mr-1"></i> Tambah</button>
+                </form>
+
+                <!-- Icon Picker -->
+                <div class="mb-4 p-3 bg-dark-bg rounded-xl border border-dark-accent">
+                    <p class="text-xs text-gray-400 mb-2 font-semibold">💡 Icon Populer (klik untuk copy):</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" data-icon="fa-solid fa-utensils"
+                            class="icon-pick px-2 py-1 bg-dark-accent rounded text-xs text-gray-300 hover:text-primary hover:bg-primary/20 transition"><i
+                                class="fa-solid fa-utensils mr-1"></i> utensils</button>
+                        <button type="button" data-icon="fa-solid fa-mug-hot"
+                            class="icon-pick px-2 py-1 bg-dark-accent rounded text-xs text-gray-300 hover:text-primary hover:bg-primary/20 transition"><i
+                                class="fa-solid fa-mug-hot mr-1"></i> mug-hot</button>
+                        <button type="button" data-icon="fa-solid fa-cookie-bite"
+                            class="icon-pick px-2 py-1 bg-dark-accent rounded text-xs text-gray-300 hover:text-primary hover:bg-primary/20 transition"><i
+                                class="fa-solid fa-cookie-bite mr-1"></i> cookie</button>
+                        <button type="button" data-icon="fa-solid fa-ice-cream"
+                            class="icon-pick px-2 py-1 bg-dark-accent rounded text-xs text-gray-300 hover:text-primary hover:bg-primary/20 transition"><i
+                                class="fa-solid fa-ice-cream mr-1"></i> ice-cream</button>
+                        <button type="button" data-icon="fa-solid fa-pizza-slice"
+                            class="icon-pick px-2 py-1 bg-dark-accent rounded text-xs text-gray-300 hover:text-primary hover:bg-primary/20 transition"><i
+                                class="fa-solid fa-pizza-slice mr-1"></i> pizza</button>
+                        <button type="button" data-icon="fa-solid fa-burger"
+                            class="icon-pick px-2 py-1 bg-dark-accent rounded text-xs text-gray-300 hover:text-primary hover:bg-primary/20 transition"><i
+                                class="fa-solid fa-burger mr-1"></i> burger</button>
+                    </div>
+                </div>
+                <div id="cat-form-status" class="text-center text-xs mb-4"></div>
+
+                <!-- Daftar Kategori -->
+                <div id="category-list" class="space-y-2">
+                    <p class="text-gray-500 text-center py-4">Memuat kategori...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: KELOLA VARIASI -->
+        <div id="view-variasi" class="view-section hidden space-y-6">
+
+            <!-- Pilih Menu -->
+            <div class="bg-dark-card rounded-2xl p-6 border border-dark-accent">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-utensils text-primary"></i> Pilih Menu
+                </h2>
+                <select id="variation-menu-select"
+                    class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                    <option value="" disabled selected>Pilih menu yang ingin ditambahkan variasi...</option>
+                </select>
+            </div>
+
+            <!-- Form Tambah Variasi -->
+            <div id="variation-form-section" class="hidden bg-dark-card rounded-2xl p-6 border border-dark-accent">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle text-primary"></i> Tambah Group Variasi
+                </h2>
+                <form id="variation-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="var-name" placeholder="Nama Variasi (cth: Pilih Ukuran)" required
+                        class="bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-gray-400 mb-1 block">Min Pilih</label>
+                            <input type="number" id="var-min" placeholder="1" min="0" value="1"
+                                class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-gray-400 mb-1 block">Max Pilih</label>
+                            <input type="number" id="var-max" placeholder="1" min="1" value="1"
+                                class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-gray-400 mb-1 block">Urutan</label>
+                            <input type="number" id="var-order" placeholder="0" min="0" value="0"
+                                class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                        </div>
+                    </div>
+
+                    <label
+                        class="flex items-center gap-2 md:col-span-2 p-3 bg-dark-bg rounded-xl border border-dark-accent cursor-pointer">
+                        <input type="checkbox" id="var-required" checked class="accent-primary w-4 h-4">
+                        <span class="text-xs text-gray-200">Wajib dipilih customer</span>
+                    </label>
+
+                    <button type="submit"
+                        class="md:col-span-2 bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3 rounded-xl transition">
+                        <i class="fa-solid fa-plus mr-2"></i> Tambah Variasi
+                    </button>
+                </form>
+            </div>
+
+            <!-- Daftar Variasi Menu Terpilih -->
+            <div id="variation-list-section" class="hidden bg-dark-card rounded-2xl p-6 border border-dark-accent">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-list text-primary"></i> Variasi Menu
+                </h2>
+                <div id="variation-list" class="space-y-4">
+                    <p class="text-gray-500 text-center py-4">Pilih menu terlebih dahulu</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- MODAL TAMBAH/EDIT OPSI VARIASI -->
+        <!-- ============================================ -->
+        <div id="variation-option-modal"
+            class="hidden fixed inset-0 z-[90] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+            <div
+                class="bg-dark-card w-full max-w-lg rounded-3xl border border-dark-accent overflow-hidden shadow-2xl animate-slide-up max-h-[90vh] flex flex-col">
+                <div class="p-5 border-b border-dark-accent flex items-center justify-between flex-shrink-0">
+                    <div>
+                        <h3 id="option-modal-title" class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle text-primary"></i>
+                            <span>Tambah Opsi</span>
+                        </h3>
+                        <p id="option-modal-variation-name" class="text-xs text-gray-400 mt-1"></p>
+                    </div>
+                    <button id="close-option-modal"
+                        class="w-8 h-8 rounded-full bg-dark-bg text-gray-400 hover:text-white flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Form Opsi -->
+                <div class="p-5 overflow-y-auto flex-1">
+                    <form id="option-form" class="grid grid-cols-3 gap-3 mb-4">
+                        <input type="hidden" id="option-id">
+                        <input type="text" id="option-name" placeholder="Nama Opsi (cth: Large)" required
+                            class="col-span-2 bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                        <input type="number" id="option-price" placeholder="Tambahan Harga" value="0" min="0"
+                            class="bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                        <button type="submit"
+                            class="col-span-3 bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3 rounded-xl transition">
+                            <i class="fa-solid fa-save mr-2"></i> Simpan Opsi
+                        </button>
+                    </form>
+
+                    <!-- Daftar Opsi -->
+                    <div id="option-list" class="space-y-2">
+                        <p class="text-gray-500 text-center py-4 text-sm">Belum ada opsi</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ============================================ -->
+    <!-- MODAL & POPUP COMPONENTS (Global) -->
+    <!-- ============================================ -->
+
+    <!-- 1. Konfirmasi Popup -->
+    <div id="confirm-popup"
+        class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+        <div
+            class="bg-dark-card w-full max-w-sm rounded-3xl border border-dark-accent overflow-hidden shadow-2xl animate-slide-up">
+            <div class="pt-8 pb-4 text-center">
+                <div id="confirm-icon-wrapper"
+                    class="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                    <i id="confirm-icon" class="text-2xl"></i>
+                </div>
+                <h3 id="confirm-title" class="text-lg font-bold text-white">Konfirmasi</h3>
+                <p id="confirm-message" class="text-xs text-gray-400 mt-2 px-6 leading-relaxed"></p>
+            </div>
+            <div id="confirm-info-box"
+                class="hidden mx-5 mb-4 bg-dark-bg/60 rounded-2xl p-3 border border-dark-accent flex items-start gap-3">
+                <i class="fa-solid fa-circle-info text-primary mt-0.5"></i>
+                <div id="confirm-info-text" class="text-[11px] text-gray-300 leading-relaxed"></div>
+            </div>
+            <div class="p-5 pt-2 grid grid-cols-2 gap-3">
+                <button id="confirm-cancel-btn"
+                    class="bg-dark-bg hover:bg-dark-accent border border-dark-accent text-gray-200 font-bold py-3 rounded-xl transition text-sm"><i
+                        class="fa-solid fa-xmark mr-1"></i> Batal</button>
+                <button id="confirm-ok-btn" class="font-bold py-3 rounded-xl transition text-sm shadow-lg"><i
+                        id="confirm-ok-icon" class="mr-1"></i><span id="confirm-ok-text">Ya</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Notifikasi Toast -->
+    <div id="notification-container" class="fixed top-5 right-5 z-[110] space-y-2 pointer-events-none max-w-sm"></div>
+
+    <!-- ============================================ -->
+    <!-- MODAL TAMBAH / EDIT MENU -->
+    <!-- ============================================ -->
+    <div id="edit-menu-modal"
+        class="hidden fixed inset-0 z-[90] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+        <div
+            class="bg-dark-card w-full max-w-2xl rounded-3xl border border-dark-accent overflow-hidden shadow-2xl animate-slide-up max-h-[90vh] flex flex-col">
+
+            <!-- Header Dinamis -->
+            <div class="p-5 border-b border-dark-accent flex items-center justify-between flex-shrink-0">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i id="menu-modal-icon" class="fa-solid fa-plus-circle text-primary"></i>
+                    <span id="menu-modal-title-text">Tambah Menu Baru</span>
+                </h3>
+                <button id="close-edit-modal"
+                    class="w-8 h-8 rounded-full bg-dark-bg text-gray-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Body Form -->
+            <div class="p-5 overflow-y-auto flex-1">
+                <form id="edit-menu-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="hidden" id="edit-menu-id">
+
+                    <!-- Preview Foto (hanya muncul saat edit) -->
+                    <div id="edit-current-image-wrapper" class="md:col-span-2 hidden">
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Foto Saat Ini</label>
+                        <img id="edit-current-image" src="" alt="Current"
+                            class="w-full h-40 object-cover rounded-xl border border-dark-accent">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Nama Menu <span
+                                class="text-red-400">*</span></label>
+                        <input type="text" id="edit-name" placeholder="cth: Nasi Goreng Spesial" required
+                            class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Kategori <span
+                                class="text-red-400">*</span></label>
+                        <select id="edit-category" required
+                            class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                            <option value="" disabled selected>Memuat kategori...</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Harga (Rp) <span
+                                class="text-red-400">*</span></label>
+                        <input type="text" id="edit-price" placeholder="28000" required inputmode="numeric"
+                            class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Badge</label>
+                        <input type="text" id="edit-badge" placeholder="cth: Terlaris, Diskon 20%"
+                            class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Waktu Penyajian</label>
+                        <input type="text" id="edit-time" placeholder="cth: 15-20 min" value="15-20 min"
+                            class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Rating</label>
+                        <input type="number" id="edit-rating" placeholder="4.5" step="0.1" min="0" max="5" value="4.5"
+                            class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">Deskripsi</label>
+                        <textarea id="edit-desc" placeholder="Deskripsi singkat tentang menu ini..." rows="3"
+                            class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white focus:outline-none focus:border-primary resize-none"></textarea>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-semibold text-gray-300 mb-1 block">
+                            Foto Menu
+                            <span id="photo-required-badge" class="text-red-400">*</span>
+                            <span id="photo-optional-badge" class="text-gray-500 hidden">(Opsional - Kosongkan jika
+                                tidak ingin mengubah)</span>
+                        </label>
+                        <input type="file" id="edit-image" accept="image/*"
+                            class="w-full bg-dark-bg border border-dark-accent p-3 rounded-xl text-sm text-white">
+                        <p class="text-[10px] text-gray-500 mt-1">
+                            <i class="fa-solid fa-circle-info mr-1"></i>
+                            Format: JPG, PNG, WebP • Maks 2MB • Auto-compress
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div
+                class="p-5 border-t border-dark-accent flex items-center justify-end gap-3 flex-shrink-0 bg-dark-bg/30">
+                <button id="cancel-edit-menu"
+                    class="bg-dark-bg hover:bg-dark-accent border border-dark-accent text-gray-200 font-bold py-3 px-6 rounded-xl transition text-sm">
+                    <i class="fa-solid fa-xmark mr-1"></i> Batal
+                </button>
+                <button id="save-edit-menu"
+                    class="bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3 px-6 rounded-xl transition text-sm">
+                    <i class="fa-solid fa-save mr-1"></i> <span id="save-btn-text">Simpan Menu</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT LOGIC -->
+    <!-- ============================================ -->
+    <script type="module">
+        import { initAuth, isAdmin, logout } from './js/auth.js';
+        import {
+            addMenuItem, subscribeAllMenu, deleteMenuItem, updateMenuItem,
+            fetchMenuItemById, deactivateMenuItem, activateMenuItem,
+            addCategory, subscribeAllCategories, updateCategory,
+            deactivateCategory, activateCategory, deleteCategory,
+            fetchMenuVariations, addVariation, updateVariation, deleteVariation,
+            addVariationOption, updateVariationOption, deleteVariationOption
+        } from './js/supabase-service.js';
+        import { setupModalClose } from './js/ui-helpers.js';
+
+        // ============================================
+        // 1. GUARD & INIT
+        // ============================================
+        const authState = await initAuth();
+        if (!authState.loggedIn || authState.role !== 'admin') {
+            alert('Akses ditolak! Hanya admin yang bisa mengakses halaman ini.');
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            await logout();
+            window.location.href = 'login.html';
+        });
+
+        // ============================================
+        // 2. TAB NAVIGATION LOGIC
+        // ============================================
+        function switchTab(tabName) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            // Show target view
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        // ============================================
+        // 3. KATEGORI LOGIC
+        // ============================================
+        const categorySelect = document.getElementById('category');
+        const editCategorySelect = document.getElementById('edit-category');
+        let editingCategoryId = null;
+        let editingMenuId = null; // null = mode tambah, string = mode edit
+
+        subscribeAllCategories((categories) => {
+            // ✅ Populate dropdown di form tambah menu
+            const categorySelect = document.getElementById('category');
+            if (categorySelect) {
+                categorySelect.innerHTML = '<option value="" disabled selected>Pilih Kategori</option>';
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.slug;
+                    opt.textContent = cat.name;
+                    categorySelect.appendChild(opt);
+                });
+            }
+
+            // ✅ Populate dropdown di modal edit menu
+            const editCategorySelect = document.getElementById('edit-category');
+            if (editCategorySelect) {
+                editCategorySelect.innerHTML = '<option value="" disabled>Pilih Kategori</option>';
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.slug;
+                    opt.textContent = cat.name;
+                    editCategorySelect.appendChild(opt);
+                });
+            }
+
+            // Render Category List
+            const list = document.getElementById('category-list');
+            if (categories.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-center py-4">Belum ada kategori</p>';
+                return;
+            }
+
+            list.innerHTML = categories.map(cat => `
+      <div class="flex items-center gap-3 p-3 bg-dark-bg rounded-xl border border-dark-accent ${!cat.is_active ? 'opacity-50' : ''}">
+        <div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary"><i class="${cat.icon}"></i></div>
+        <div class="flex-1">
+          <h3 class="font-bold text-sm text-white">${cat.name}</h3>
+          <p class="text-xs text-gray-400">slug: ${cat.slug} • urutan: ${cat.sort_order}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          ${cat.is_active
+                    ? `<button data-deact="${cat.id}" data-name="${cat.name}" class="bg-yellow-500/20 text-yellow-400 px-2 py-1.5 rounded-lg text-xs hover:bg-yellow-500/30 transition" title="Nonaktifkan"><i class="fa-solid fa-eye-slash"></i></button>`
+                    : `<button data-act="${cat.id}" data-name="${cat.name}" class="bg-green-500/20 text-green-400 px-2 py-1.5 rounded-lg text-xs hover:bg-green-500/30 transition" title="Aktifkan"><i class="fa-solid fa-eye"></i></button>`
+                }
+          <button data-edit-cat="${cat.id}" data-name="${cat.name}" data-icon="${cat.icon}" data-order="${cat.sort_order}" class="bg-blue-500/20 text-blue-400 px-2 py-1.5 rounded-lg text-xs hover:bg-blue-500/30 transition" title="Edit"><i class="fa-solid fa-pen"></i></button>
+          <button data-del-cat="${cat.id}" data-name="${cat.name}" class="bg-red-500/20 text-red-400 px-2 py-1.5 rounded-lg text-xs hover:bg-red-500/30 transition" title="Hapus Permanen"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    `).join('');
+
+            // Bind Category Actions
+            list.querySelectorAll('[data-deact]').forEach(btn => btn.addEventListener('click', () => handleCategoryAction('deactivate', btn.dataset.deact, btn.dataset.name)));
+            list.querySelectorAll('[data-act]').forEach(btn => btn.addEventListener('click', () => handleCategoryAction('activate', btn.dataset.act, btn.dataset.name)));
+            list.querySelectorAll('[data-del-cat]').forEach(btn => btn.addEventListener('click', () => handleCategoryAction('delete', btn.dataset.delCat, btn.dataset.name)));
+            list.querySelectorAll('[data-edit-cat]').forEach(btn => btn.addEventListener('click', () => {
+                document.getElementById('cat-name').value = btn.dataset.name;
+                document.getElementById('cat-icon').value = btn.dataset.icon;
+                document.getElementById('cat-order').value = btn.dataset.order;
+                editingCategoryId = btn.dataset.editCat;
+                const submitBtn = document.querySelector('#category-form button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fa-solid fa-save mr-1"></i> Update';
+                submitBtn.classList.add('bg-blue-500');
+                if (!document.getElementById('cancel-edit-cat-btn')) {
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.id = 'cancel-edit-cat-btn';
+                    cancelBtn.type = 'button';
+                    cancelBtn.className = 'bg-dark-accent text-gray-300 font-bold py-3 px-4 rounded-xl transition text-sm hover:bg-dark-accent/80';
+                    cancelBtn.innerHTML = '<i class="fa-solid fa-xmark mr-1"></i> Batal';
+                    cancelBtn.addEventListener('click', cancelCatEdit);
+                    submitBtn.parentNode.appendChild(cancelBtn);
+                }
+            }));
+        });
+
+        async function handleCategoryAction(action, id, name) {
+            if (action === 'deactivate') {
+                showConfirmPopup({ title: 'Nonaktifkan Kategori?', message: `Kategori "${name}" akan disembunyikan.`, type: 'warning', confirmText: 'Ya, Nonaktifkan', infoText: 'Kategori tidak dihapus, bisa diaktifkan kembali.', onConfirm: async () => { const res = await deactivateCategory(id); if (res.success) showNotification(`"${name}" dinonaktifkan`, 'success'); } });
+            } else if (action === 'activate') {
+                const res = await activateCategory(id);
+                if (res.success) showNotification(`"${name}" diaktifkan`, 'success');
+            } else if (action === 'delete') {
+                showConfirmPopup({ title: 'Hapus Permanen?', message: `Kategori "${name}" akan dihapus selamanya.`, type: 'danger', confirmText: 'Ya, Hapus', infoText: '⚠️ Menu dalam kategori ini akan kehilangan labelnya.', onConfirm: async () => { const res = await deleteCategory(id); if (res.success) showNotification(`"${name}" dihapus`, 'success'); } });
+            }
+        }
+
+        function cancelCatEdit() {
+            editingCategoryId = null;
+            document.getElementById('category-form').reset();
+            document.getElementById('cat-icon').value = 'fa-solid fa-utensils';
+            const submitBtn = document.querySelector('#category-form button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fa-solid fa-plus mr-1"></i> Tambah';
+            submitBtn.classList.remove('bg-blue-500');
+            const cancelBtn = document.getElementById('cancel-edit-cat-btn');
+            if (cancelBtn) cancelBtn.remove();
+        }
+
+        // Category Form Submit
+        document.getElementById('category-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (editingCategoryId) {
+                const res = await updateCategory(editingCategoryId, { name: document.getElementById('cat-name').value, icon: document.getElementById('cat-icon').value, sort_order: parseInt(document.getElementById('cat-order').value) || 0 });
+                if (res.success) { showNotification('Kategori diupdate!', 'success'); cancelCatEdit(); } else { showNotification(res.error, 'error'); }
+                return;
+            }
+            const res = await addCategory({ name: document.getElementById('cat-name').value, icon: document.getElementById('cat-icon').value, sort_order: parseInt(document.getElementById('cat-order').value) || 0 });
+            if (res.success) {
+                showNotification(`Kategori "${res.data.name}" ditambahkan!`, 'success');
+                e.target.reset(); document.getElementById('cat-icon').value = 'fa-solid fa-utensils'; document.getElementById('cat-order').value = '0';
+            } else {
+                showNotification(res.errorType === 'duplicate' ? res.error : 'Gagal menambahkan', res.errorType === 'duplicate' ? 'warning' : 'error');
+            }
+        });
+
+        document.querySelectorAll('.icon-pick').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('cat-icon').value = btn.dataset.icon;
+                document.querySelectorAll('.icon-pick').forEach(b => b.classList.remove('ring-2', 'ring-primary'));
+                btn.classList.add('ring-2', 'ring-primary');
+            });
+        });
+
+        // ============================================
+        // 4. MENU LOGIC
+        // ============================================
+        // ✅ GANTI DENGAN INI: Format harga untuk modal edit/tambah
+        const editPriceInput = document.getElementById('edit-price');
+        if (editPriceInput) {
+            editPriceInput.addEventListener('input', (e) => {
+                let raw = e.target.value.replace(/\D/g, '');
+                e.target.value = raw ? parseInt(raw, 10).toLocaleString('id-ID') : '';
+            });
+        }
+
+        subscribeAllMenu((menus) => {
+            document.getElementById('stat-menu').innerText = menus.filter(m => m.is_active).length;
+            const list = document.getElementById('menu-list');
+
+            if (menus.length === 0) {
+                list.innerHTML = `
+      <div class="text-center py-12">
+        <i class="fa-solid fa-utensils text-5xl text-gray-600 mb-4"></i>
+        <p class="text-gray-400 text-sm mb-2">Belum ada menu</p>
+        <button id="empty-add-menu-btn" class="mt-3 bg-primary hover:bg-primary-dark text-dark-bg font-bold py-2.5 px-5 rounded-xl transition text-sm inline-flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> Tambah Menu Pertama
+        </button>
+      </div>
+    `;
+
+                // Bind tombol di empty state
+                const emptyBtn = document.getElementById('empty-add-menu-btn');
+                if (emptyBtn) {
+                    emptyBtn.addEventListener('click', openAddMenuModal);
+                }
+                return;
+            }
+
+            list.innerHTML = menus.map(item => `
+    <div class="flex items-center gap-3 p-3 bg-dark-bg rounded-xl border border-dark-accent ${!item.is_active ? 'opacity-50' : ''}">
+      <img src="${item.img}" alt="" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1">
+          <h3 class="font-bold text-sm text-white truncate">${item.name}</h3>
+          ${item.badge ? `<span class="bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold flex-shrink-0">${item.badge}</span>` : ''}
+          ${!item.is_active ? `<span class="bg-red-500/20 text-red-400 text-[10px] px-2 py-0.5 rounded-full font-bold flex-shrink-0">Nonaktif</span>` : ''}
+        </div>
+        <p class="text-xs text-gray-400 truncate">${item.category} • Rp ${item.price.toLocaleString('id-ID')} • ⭐ ${item.rating}</p>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        ${item.is_active
+                    ? `<button data-deact-menu="${item.id}" data-name="${item.name}" class="bg-yellow-500/20 text-yellow-400 px-2 py-1.5 rounded-lg text-xs hover:bg-yellow-500/30 transition" title="Nonaktifkan"><i class="fa-solid fa-eye-slash"></i></button>`
+                    : `<button data-act-menu="${item.id}" data-name="${item.name}" class="bg-green-500/20 text-green-400 px-2 py-1.5 rounded-lg text-xs hover:bg-green-500/30 transition" title="Aktifkan"><i class="fa-solid fa-eye"></i></button>`
+                }
+        <button data-edit-menu="${item.id}" class="bg-blue-500/20 text-blue-400 px-2 py-1.5 rounded-lg text-xs hover:bg-blue-500/30 transition" title="Edit">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button data-del-menu="${item.id}" data-name="${item.name}" data-img="${item.img}" class="bg-red-500/20 text-red-400 px-2 py-1.5 rounded-lg text-xs hover:bg-red-500/30 transition" title="Hapus Permanen">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+            // Bind tombol aksi
+            list.querySelectorAll('[data-deact-menu]').forEach(btn => btn.addEventListener('click', () => {
+                showConfirmPopup({
+                    title: 'Nonaktifkan Menu?',
+                    message: `Menu "${btn.dataset.name}" akan disembunyikan.`,
+                    type: 'warning',
+                    confirmText: 'Ya, Nonaktifkan',
+                    infoText: 'Menu tidak dihapus, bisa diaktifkan kembali.',
+                    onConfirm: async () => {
+                        const res = await deactivateMenuItem(btn.dataset.deactMenu);
+                        if (res.success) showNotification('Menu dinonaktifkan', 'success');
+                    }
+                });
+            }));
+
+            list.querySelectorAll('[data-act-menu]').forEach(btn => btn.addEventListener('click', async () => {
+                const res = await activateMenuItem(btn.dataset.actMenu);
+                if (res.success) showNotification('Menu diaktifkan kembali', 'success');
+            }));
+
+            list.querySelectorAll('[data-del-menu]').forEach(btn => btn.addEventListener('click', () => {
+                showConfirmPopup({
+                    title: 'Hapus Menu Permanen?',
+                    message: `Menu "${btn.dataset.name}" akan dihapus selamanya beserta fotonya.`,
+                    type: 'danger',
+                    confirmText: 'Ya, Hapus',
+                    infoText: '⚠️ Riwayat pesanan tetap ada, tapi detail menu tidak bisa ditampilkan.',
+                    onConfirm: async () => {
+                        const res = await deleteMenuItem(btn.dataset.delMenu, btn.dataset.img);
+                        if (res.success) showNotification('Menu dihapus permanen', 'success');
+                    }
+                });
+            }));
+
+            // ✅ Tombol Edit → buka modal dengan mode edit
+            list.querySelectorAll('[data-edit-menu]').forEach(btn => btn.addEventListener('click', async () => {
+                await openEditModal(btn.dataset.editMenu);
+            }));
+        });
+
+        // ============================================
+        // MODAL MENU: OPEN & CLOSE
+        // ============================================
+        const editModal = document.getElementById('edit-menu-modal');
+
+        // ✅ Mode TAMBAH MENU BARU
+        function openAddMenuModal() {
+            editingMenuId = null;
+
+            // ✅ NULL CHECK untuk semua elemen
+            const form = document.getElementById('edit-menu-form');
+            if (form) form.reset();
+
+            const menuIdInput = document.getElementById('edit-menu-id');
+            if (menuIdInput) menuIdInput.value = '';
+
+            const ratingInput = document.getElementById('edit-rating');
+            if (ratingInput) ratingInput.value = '4.5';
+
+            const timeInput = document.getElementById('edit-time');
+            if (timeInput) timeInput.value = '15-20 min';
+
+            const imageInput = document.getElementById('edit-image');
+            if (imageInput) imageInput.value = '';
+
+            // Update UI mode tambah
+            const titleText = document.getElementById('menu-modal-title-text');
+            if (titleText) titleText.innerText = 'Tambah Menu Baru';
+
+            const titleIcon = document.getElementById('menu-modal-icon');
+            if (titleIcon) titleIcon.className = 'fa-solid fa-plus-circle text-primary';
+
+            const saveBtnText = document.getElementById('save-btn-text');
+            if (saveBtnText) saveBtnText.innerText = 'Simpan Menu';
+
+            const imageWrapper = document.getElementById('edit-current-image-wrapper');
+            if (imageWrapper) imageWrapper.classList.add('hidden');
+
+            const photoRequired = document.getElementById('photo-required-badge');
+            if (photoRequired) photoRequired.classList.remove('hidden');
+
+            const photoOptional = document.getElementById('photo-optional-badge');
+            if (photoOptional) photoOptional.classList.add('hidden');
+
+            const editModal = document.getElementById('edit-menu-modal');
+            if (editModal) {
+                editModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            setTimeout(() => {
+                const nameInput = document.getElementById('edit-name');
+                if (nameInput) nameInput.focus();
+            }, 100);
+        }
+
+        // ✅ Mode EDIT MENU EXISTING
+        async function openEditModal(menuId) {
+            const menu = await fetchMenuItemById(menuId);
+            if (!menu) {
+                showNotification('Gagal memuat data menu', 'error');
+                return;
+            }
+
+            editingMenuId = menuId;
+
+            // ✅ Safe setter helper
+            const setValue = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.value = value;
+            };
+
+            setValue('edit-menu-id', menu.id);
+            setValue('edit-name', menu.name);
+            setValue('edit-category', menu.category);
+            setValue('edit-price', parseInt(menu.price).toLocaleString('id-ID'));
+            setValue('edit-badge', menu.badge || '');
+            setValue('edit-time', menu.time || '15-20 min');
+            setValue('edit-rating', menu.rating || 4.5);
+            setValue('edit-desc', menu.description || '');
+            setValue('edit-image', '');
+
+            // Preview foto
+            const imageWrapper = document.getElementById('edit-current-image-wrapper');
+            const currentImage = document.getElementById('edit-current-image');
+            if (imageWrapper && currentImage) {
+                if (menu.image_url) {
+                    currentImage.src = menu.image_url;
+                    imageWrapper.classList.remove('hidden');
+                } else {
+                    imageWrapper.classList.add('hidden');
+                }
+            }
+
+            // Update UI mode edit
+            const titleText = document.getElementById('menu-modal-title-text');
+            if (titleText) titleText.innerText = 'Edit Menu';
+
+            const titleIcon = document.getElementById('menu-modal-icon');
+            if (titleIcon) titleIcon.className = 'fa-solid fa-pen-to-square text-primary';
+
+            const saveBtnText = document.getElementById('save-btn-text');
+            if (saveBtnText) saveBtnText.innerText = 'Update Menu';
+
+            const photoRequired = document.getElementById('photo-required-badge');
+            if (photoRequired) photoRequired.classList.add('hidden');
+
+            const photoOptional = document.getElementById('photo-optional-badge');
+            if (photoOptional) photoOptional.classList.remove('hidden');
+
+            const editModal = document.getElementById('edit-menu-modal');
+            if (editModal) {
+                editModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeEditModal() {
+            const editModal = document.getElementById('edit-menu-modal');
+            if (editModal) {
+                editModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+            editingMenuId = null;
+            const form = document.getElementById('edit-menu-form');
+            if (form) form.reset();
+        }
+
+        // ============================================
+        // EVENT LISTENERS MODAL
+        // ============================================
+        // Tombol "Tambah Menu Baru" (jika ada di header)
+        const btnOpenAddMenu = document.getElementById('btn-open-add-menu');
+        if (btnOpenAddMenu) {
+            btnOpenAddMenu.addEventListener('click', openAddMenuModal);
+        }
+
+        // Tombol X di modal
+        const closeBtn = document.getElementById('close-edit-modal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeEditModal);
+        }
+
+        // Tombol Batal
+        const cancelBtn = document.getElementById('cancel-edit-menu');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', closeEditModal);
+        }
+
+        // ============================================
+        // SAVE MENU (Support Add & Edit)
+        // ============================================
+        const saveBtn = document.getElementById('save-edit-menu');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', async () => {
+                const btn = document.getElementById('save-edit-menu');
+                const originalHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-1"></i> <span>Menyimpan...</span>';
+
+                try {
+                    const menuData = {
+                        name: document.getElementById('edit-name').value,
+                        category: document.getElementById('edit-category').value,
+                        price: document.getElementById('edit-price').value.replace(/\./g, ''),
+                        badge: document.getElementById('edit-badge').value,
+                        time: document.getElementById('edit-time').value,
+                        rating: document.getElementById('edit-rating').value,
+                        desc: document.getElementById('edit-desc').value,
+                    };
+
+                    const newImageFile = document.getElementById('edit-image').files[0];
+
+                    let result;
+
+                    if (editingMenuId) {
+                        // Mode EDIT
+                        result = await updateMenuItem(editingMenuId, menuData, newImageFile);
+                        if (result.success) {
+                            showNotification(`Menu "${menuData.name}" berhasil diupdate!`, 'success');
+                        } else {
+                            throw new Error(result.error);
+                        }
+                    } else {
+                        // Mode TAMBAH
+                        if (!newImageFile) {
+                            throw new Error('Foto menu wajib diupload untuk menu baru');
+                        }
+
+                        result = await addMenuItem(menuData, newImageFile);
+                        if (result.success) {
+                            showNotification(`Menu "${result.data.name}" berhasil ditambahkan!`, 'success');
+                        } else {
+                            throw new Error(result.error);
+                        }
+                    }
+
+                    closeEditModal();
+
+                } catch (error) {
+                    console.error('Save menu error:', error);
+                    showNotification(error.message || 'Gagal menyimpan menu', 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            });
+        }
+
+        // ============================================
+        // EVENT LISTENERS: MODAL MENU
+        // ============================================
+
+        // Tombol "Tambah Menu Baru" di header
+        document.getElementById('btn-open-add-menu').addEventListener('click', openAddMenuModal);
+
+        // Tombol X di header modal
+        document.getElementById('close-edit-modal').addEventListener('click', closeEditModal);
+
+        // Tombol "Batal" di footer
+        document.getElementById('cancel-edit-menu').addEventListener('click', closeEditModal);
+
+        // Klik backdrop untuk tutup
+        editModal.addEventListener('mousedown', (e) => {
+            if (e.target === editModal) closeEditModal();
+        });
+
+        // ESC untuk tutup
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !editModal.classList.contains('hidden')) {
+                closeEditModal();
+            }
+        });
+
+        // Setup modal edit menu
+        setupModalClose('edit-menu-modal', closeEditModal);
+
+        document.getElementById('close-edit-modal').addEventListener('click', closeEditModal);
+        document.getElementById('cancel-edit-menu').addEventListener('click', closeEditModal);
+        editModal.addEventListener('click', (e) => { if (e.target.id === 'edit-menu-modal') closeEditModal(); });
+
+        // ============================================
+        // SAVE MENU (Support Add & Edit Mode)
+        // ============================================
+        document.getElementById('save-edit-menu').addEventListener('click', async () => {
+            const btn = document.getElementById('save-edit-menu');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-1"></i> <span>Menyimpan...</span>';
+
+            try {
+                const menuData = {
+                    name: document.getElementById('edit-name').value,
+                    category: document.getElementById('edit-category').value,
+                    price: document.getElementById('edit-price').value.replace(/\./g, ''),
+                    badge: document.getElementById('edit-badge').value,
+                    time: document.getElementById('edit-time').value,
+                    rating: document.getElementById('edit-rating').value,
+                    desc: document.getElementById('edit-desc').value,
+                };
+
+                const newImageFile = document.getElementById('edit-image').files[0];
+
+                let result;
+
+                if (editingMenuId) {
+                    // ✅ MODE EDIT: Update menu existing
+                    result = await updateMenuItem(editingMenuId, menuData, newImageFile);
+                    if (result.success) {
+                        showNotification(`Menu "${menuData.name}" berhasil diupdate!`, 'success');
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } else {
+                    // ✅ MODE TAMBAH: Validasi foto wajib
+                    if (!newImageFile) {
+                        throw new Error('Foto menu wajib diupload untuk menu baru');
+                    }
+
+                    result = await addMenuItem(menuData, newImageFile);
+                    if (result.success) {
+                        showNotification(`Menu "${result.data.name}" berhasil ditambahkan!`, 'success');
+                    } else {
+                        throw new Error(result.error);
+                    }
+                }
+
+                closeEditModal();
+
+            } catch (error) {
+                console.error('Save menu error:', error);
+                showNotification(error.message || 'Gagal menyimpan menu', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        });
+
+        // ============================================
+        // 5. POPUP & NOTIFICATION HELPERS
+        // ============================================
+        function showConfirmPopup(options) {
+            const popup = document.getElementById('confirm-popup');
+            const typeConfig = {
+                danger: { wrapper: 'bg-red-500/15 border-2 border-red-500/30', icon: 'fa-solid fa-triangle-exclamation text-red-400', btn: 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20', okIcon: 'fa-solid fa-trash' },
+                warning: { wrapper: 'bg-yellow-500/15 border-2 border-yellow-500/30', icon: 'fa-solid fa-eye-slash text-yellow-400', btn: 'bg-yellow-500 hover:bg-yellow-600 text-dark-bg shadow-yellow-500/20', okIcon: 'fa-solid fa-check' },
+                info: { wrapper: 'bg-blue-500/15 border-2 border-blue-500/30', icon: 'fa-solid fa-circle-info text-blue-400', btn: 'bg-blue-500 hover:bg-blue-600 text-white shadow-blue-500/20', okIcon: 'fa-solid fa-check' }
+            };
+            const config = typeConfig[options.type] || typeConfig.info;
+            document.getElementById('confirm-icon-wrapper').className = `w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${config.wrapper}`;
+            document.getElementById('confirm-icon').className = `${config.icon} text-2xl ${options.icon || ''}`;
+            document.getElementById('confirm-title').textContent = options.title || 'Konfirmasi';
+            document.getElementById('confirm-message').textContent = options.message || '';
+            const okBtn = document.getElementById('confirm-ok-btn');
+            okBtn.className = `font-bold py-3 rounded-xl transition text-sm shadow-lg ${config.btn}`;
+            document.getElementById('confirm-ok-icon').className = config.okIcon;
+            document.getElementById('confirm-ok-text').textContent = options.confirmText || 'Ya';
+            document.getElementById('confirm-cancel-btn').innerHTML = `<i class="fa-solid fa-xmark mr-1"></i> ${options.cancelText || 'Batal'}`;
+
+            const infoBox = document.getElementById('confirm-info-box');
+            if (options.infoText) { infoBox.classList.remove('hidden'); document.getElementById('confirm-info-text').innerHTML = options.infoText; } else { infoBox.classList.add('hidden'); }
+
+            popup.classList.remove('hidden'); document.body.style.overflow = 'hidden';
+            const cleanup = () => { popup.classList.add('hidden'); document.body.style.overflow = ''; okBtn.onclick = null; document.getElementById('confirm-cancel-btn').onclick = null; };
+            okBtn.onclick = () => { cleanup(); if (options.onConfirm) options.onConfirm(); };
+            document.getElementById('confirm-cancel-btn').onclick = cleanup;
+            popup.onclick = (e) => { if (e.target.id === 'confirm-popup') cleanup(); };
+        }
+
+        function showNotification(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('notification-container');
+            const config = {
+                success: { bg: 'bg-green-500/15', border: 'border-green-500/40', icon: 'fa-solid fa-circle-check text-green-400', title: 'Berhasil' },
+                error: { bg: 'bg-red-500/15', border: 'border-red-500/40', icon: 'fa-solid fa-circle-xmark text-red-400', title: 'Gagal' },
+                warning: { bg: 'bg-yellow-500/15', border: 'border-yellow-500/40', icon: 'fa-solid fa-triangle-exclamation text-yellow-400', title: 'Peringatan' },
+                info: { bg: 'bg-blue-500/15', border: 'border-blue-500/40', icon: 'fa-solid fa-circle-info text-blue-400', title: 'Informasi' }
+            }[type] || { bg: 'bg-blue-500/15', border: 'border-blue-500/40', icon: 'fa-solid fa-circle-info text-blue-400', title: 'Informasi' };
+
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto ${config.bg} backdrop-blur-md border ${config.border} rounded-2xl p-4 shadow-2xl animate-slide-in-right flex items-start gap-3`;
+            toast.innerHTML = `<div class="flex-shrink-0 mt-0.5"><i class="${config.icon} text-lg"></i></div><div class="flex-1 min-w-0"><p class="font-bold text-sm text-white">${config.title}</p><p class="text-xs text-gray-300 mt-0.5 leading-relaxed">${message}</p></div><button class="flex-shrink-0 text-gray-400 hover:text-white transition"><i class="fa-solid fa-xmark text-sm"></i></button>`;
+            container.appendChild(toast);
+            const remove = () => { toast.classList.remove('animate-slide-in-right'); toast.classList.add('animate-slide-out-right'); setTimeout(() => toast.remove(), 300); };
+            toast.querySelector('button').onclick = remove;
+            setTimeout(remove, duration);
+        }
+
+        // ============================================
+        // 🎨 VARIASI LOGIC
+        // ============================================
+        let selectedMenuIdForVariation = null;
+        let currentVariations = [];
+        let editingVariationId = null;
+        let editingOptionId = null;
+        let currentVariationForOptions = null;
+
+        // Populate dropdown menu
+        subscribeAllMenu((menus) => {
+            const select = document.getElementById('variation-menu-select');
+            const activeMenus = menus.filter(m => m.is_active);
+
+            select.innerHTML = '<option value="" disabled selected>Pilih menu yang ingin ditambahkan variasi...</option>';
+            activeMenus.forEach(menu => {
+                const opt = document.createElement('option');
+                opt.value = menu.id;
+                opt.textContent = `${menu.name} (Rp ${menu.price.toLocaleString('id-ID')})`;
+                select.appendChild(opt);
+            });
+        });
+
+        // Saat menu dipilih
+        document.getElementById('variation-menu-select').addEventListener('change', async (e) => {
+            selectedMenuIdForVariation = e.target.value;
+            document.getElementById('variation-form-section').classList.remove('hidden');
+            document.getElementById('variation-list-section').classList.remove('hidden');
+            await loadVariations(selectedMenuIdForVariation);
+        });
+
+        // Load variasi untuk menu terpilih
+        async function loadVariations(menuId) {
+            currentVariations = await fetchMenuVariations(menuId);
+            renderVariationList();
+        }
+
+        function renderVariationList() {
+            const list = document.getElementById('variation-list');
+
+            if (currentVariations.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-center py-4 text-sm">Menu ini belum memiliki variasi</p>';
+                return;
+            }
+
+            list.innerHTML = currentVariations.map(v => `
+    <div class="bg-dark-bg rounded-xl border border-dark-accent p-4">
+      <div class="flex items-start justify-between mb-3">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-1">
+            <h3 class="font-bold text-sm text-white">${v.name}</h3>
+            ${v.is_required
+                    ? '<span class="bg-red-500/20 text-red-400 text-[10px] px-2 py-0.5 rounded-full font-bold">WAJIB</span>'
+                    : '<span class="bg-blue-500/20 text-blue-400 text-[10px] px-2 py-0.5 rounded-full font-bold">OPSIONAL</span>'}
+          </div>
+          <p class="text-xs text-gray-400">
+            Pilih ${v.min_select === v.max_select ? v.min_select : `${v.min_select} - ${v.max_select}`} item
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button data-edit-var="${v.id}" data-name="${v.name}" data-min="${v.min_select}" data-max="${v.max_select}" data-required="${v.is_required}" data-order="${v.sort_order}"
+            class="bg-blue-500/20 text-blue-400 px-2 py-1.5 rounded-lg text-xs hover:bg-blue-500/30 transition" title="Edit">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+          <button data-manage-options="${v.id}" data-name="${v.name}"
+            class="bg-primary/20 text-primary px-2 py-1.5 rounded-lg text-xs hover:bg-primary/30 transition" title="Kelola Opsi">
+            <i class="fa-solid fa-list"></i> Opsi (${v.options?.length || 0})
+          </button>
+          <button data-del-var="${v.id}" data-name="${v.name}"
+            class="bg-red-500/20 text-red-400 px-2 py-1.5 rounded-lg text-xs hover:bg-red-500/30 transition" title="Hapus">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      </div>
+      
+      ${v.options && v.options.length > 0 ? `
+        <div class="pt-3 border-t border-dark-accent/50 space-y-1">
+          ${v.options.map(opt => `
+            <div class="flex items-center justify-between text-xs py-1">
+              <span class="text-gray-300">• ${opt.name}</span>
+              <span class="text-primary font-semibold">${opt.price_addon > 0 ? `+Rp ${opt.price_addon.toLocaleString('id-ID')}` : 'Gratis'}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<p class="text-xs text-gray-500 italic pt-2">Belum ada opsi ditambahkan</p>'}
+    </div>
+  `).join('');
+
+            // Bind tombol aksi
+            list.querySelectorAll('[data-edit-var]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    editingVariationId = btn.dataset.editVar;
+                    document.getElementById('var-name').value = btn.dataset.name;
+                    document.getElementById('var-min').value = btn.dataset.min;
+                    document.getElementById('var-max').value = btn.dataset.max;
+                    document.getElementById('var-order').value = btn.dataset.order;
+                    document.getElementById('var-required').checked = btn.dataset.required === 'true';
+
+                    const submitBtn = document.querySelector('#variation-form button[type="submit"]');
+                    submitBtn.innerHTML = '<i class="fa-solid fa-save mr-2"></i> Update Variasi';
+                    submitBtn.classList.add('bg-blue-500');
+
+                    if (!document.getElementById('cancel-var-edit-btn')) {
+                        const cancelBtn = document.createElement('button');
+                        cancelBtn.id = 'cancel-var-edit-btn';
+                        cancelBtn.type = 'button';
+                        cancelBtn.className = 'md:col-span-2 bg-dark-accent text-gray-300 font-bold py-3 rounded-xl transition text-sm hover:bg-dark-accent/80';
+                        cancelBtn.innerHTML = '<i class="fa-solid fa-xmark mr-1"></i> Batal Edit';
+                        cancelBtn.addEventListener('click', cancelVariationEdit);
+                        submitBtn.parentNode.appendChild(cancelBtn);
+                    }
+                });
+            });
+
+            list.querySelectorAll('[data-manage-options]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentVariationForOptions = {
+                        id: btn.dataset.manageOptions,
+                        name: btn.dataset.name
+                    };
+                    openOptionModal();
+                });
+            });
+
+            list.querySelectorAll('[data-del-var]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    showConfirmPopup({
+                        title: 'Hapus Variasi?',
+                        message: `Variasi "${btn.dataset.name}" beserta semua opsinya akan dihapus permanen.`,
+                        type: 'danger',
+                        confirmText: 'Ya, Hapus',
+                        onConfirm: async () => {
+                            const result = await deleteVariation(btn.dataset.delVar);
+                            if (result.success) {
+                                showNotification('Variasi berhasil dihapus', 'success');
+                                loadVariations(selectedMenuIdForVariation);
+                            } else {
+                                showNotification(result.error, 'error');
+                            }
+                        }
+                    });
+                });
+            });
+        }
+
+        function cancelVariationEdit() {
+            editingVariationId = null;
+            document.getElementById('variation-form').reset();
+            document.getElementById('var-min').value = '1';
+            document.getElementById('var-max').value = '1';
+            document.getElementById('var-order').value = '0';
+            document.getElementById('var-required').checked = true;
+            const submitBtn = document.querySelector('#variation-form button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fa-solid fa-plus mr-2"></i> Tambah Variasi';
+            submitBtn.classList.remove('bg-blue-500');
+            const cancelBtn = document.getElementById('cancel-var-edit-btn');
+            if (cancelBtn) cancelBtn.remove();
+        }
+
+        // Form submit variasi
+        document.getElementById('variation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!selectedMenuIdForVariation) return;
+
+            const variationData = {
+                name: document.getElementById('var-name').value,
+                min_select: document.getElementById('var-min').value,
+                max_select: document.getElementById('var-max').value,
+                is_required: document.getElementById('var-required').checked,
+                sort_order: document.getElementById('var-order').value
+            };
+
+            let result;
+            if (editingVariationId) {
+                result = await updateVariation(editingVariationId, variationData);
+            } else {
+                result = await addVariation(selectedMenuIdForVariation, variationData);
+            }
+
+            if (result.success) {
+                showNotification(editingVariationId ? 'Variasi diupdate!' : 'Variasi ditambahkan!', 'success');
+                cancelVariationEdit();
+                loadVariations(selectedMenuIdForVariation);
+            } else {
+                showNotification(result.error, 'error');
+            }
+        });
+
+        // ============================================
+        // MODAL OPSI VARIASI
+        // ============================================
+        const optionModal = document.getElementById('variation-option-modal');
+
+        function openOptionModal() {
+            document.getElementById('option-modal-variation-name').innerText = `Variasi: ${currentVariationForOptions.name}`;
+            document.getElementById('option-form').reset();
+            document.getElementById('option-price').value = '0';
+            document.getElementById('option-id').value = '';
+            editingOptionId = null;
+            document.getElementById('option-modal-title').innerHTML = '<i class="fa-solid fa-plus-circle text-primary"></i> <span>Tambah Opsi</span>';
+
+            loadOptions(currentVariationForOptions.id);
+            optionModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeOptionModal() {
+            optionModal.classList.add('hidden');
+            document.body.style.overflow = '';
+            currentVariationForOptions = null;
+        }
+
+        async function loadOptions(variationId) {
+            const variations = await fetchMenuVariations(selectedMenuIdForVariation);
+            const variation = variations.find(v => v.id === variationId);
+            const options = variation?.options || [];
+
+            const list = document.getElementById('option-list');
+            if (options.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-center py-4 text-sm">Belum ada opsi</p>';
+                return;
+            }
+
+            list.innerHTML = options.map(opt => `
+    <div class="flex items-center justify-between p-2 bg-dark-bg rounded-lg border border-dark-accent">
+      <div class="flex-1">
+        <p class="text-sm text-white font-medium">${opt.name}</p>
+        <p class="text-xs text-primary">${opt.price_addon > 0 ? `+Rp ${opt.price_addon.toLocaleString('id-ID')}` : 'Gratis'}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button data-edit-opt="${opt.id}" data-name="${opt.name}" data-price="${opt.price_addon}"
+          class="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs hover:bg-blue-500/30 transition">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button data-del-opt="${opt.id}" data-name="${opt.name}"
+          class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs hover:bg-red-500/30 transition">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+            // Bind tombol
+            list.querySelectorAll('[data-edit-opt]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    editingOptionId = btn.dataset.editOpt;
+                    document.getElementById('option-id').value = btn.dataset.editOpt;
+                    document.getElementById('option-name').value = btn.dataset.name;
+                    document.getElementById('option-price').value = btn.dataset.price;
+                    document.getElementById('option-modal-title').innerHTML = '<i class="fa-solid fa-pen text-primary"></i> <span>Edit Opsi</span>';
+                });
+            });
+
+            list.querySelectorAll('[data-del-opt]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm(`Hapus opsi "${btn.dataset.name}"?`)) return;
+                    const result = await deleteVariationOption(btn.dataset.delOpt);
+                    if (result.success) {
+                        showNotification('Opsi dihapus', 'success');
+                        loadOptions(currentVariationForOptions.id);
+                        loadVariations(selectedMenuIdForVariation);
+                    }
+                });
+            });
+        }
+
+        document.getElementById('close-option-modal').addEventListener('click', closeOptionModal);
+        setupModalClose('variation-option-modal', closeOptionModal);
+
+        // Form submit opsi
+        document.getElementById('option-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentVariationForOptions) return;
+
+            const optionData = {
+                name: document.getElementById('option-name').value,
+                price_addon: document.getElementById('option-price').value || 0
+            };
+
+            let result;
+            if (editingOptionId) {
+                result = await updateVariationOption(editingOptionId, optionData);
+            } else {
+                result = await addVariationOption(currentVariationForOptions.id, optionData);
+            }
+
+            if (result.success) {
+                showNotification(editingOptionId ? 'Opsi diupdate!' : 'Opsi ditambahkan!', 'success');
+                document.getElementById('option-form').reset();
+                document.getElementById('option-price').value = '0';
+                document.getElementById('option-id').value = '';
+                editingOptionId = null;
+                document.getElementById('option-modal-title').innerHTML = '<i class="fa-solid fa-plus-circle text-primary"></i> <span>Tambah Opsi</span>';
+                loadOptions(currentVariationForOptions.id);
+                loadVariations(selectedMenuIdForVariation);
+            } else {
+                showNotification(result.error, 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Banalavyou</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FFBF1E',
+                        'primary-dark': '#e6a80d',
+                        'dark-bg': '#261A16',
+                        'dark-card': '#382112',
+                        'dark-accent': '#593720',
+                    },
+                    fontFamily: { poppins: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .glass-panel {
+            background: rgba(56, 33, 18, 0.9);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 191, 30, 0.15);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-dark-bg text-white flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <div
+                class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-dark-bg font-bold text-2xl mx-auto mb-3 shadow-lg">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h1 class="text-2xl font-extrabold">Banalavyou</h1>
+            <p class="text-xs text-gray-400 mt-1">Masuk untuk pengalaman terbaik</p>
+        </div>
+
+        <!-- Auth Card -->
+        <div class="glass-panel rounded-3xl p-6 space-y-6">
+
+            <!-- Tab Switcher: Login / Register -->
+            <div class="flex bg-dark-bg rounded-2xl p-1">
+                <button id="tab-login" data-action="switch-auth-tab" data-tab="login"
+                    class="flex-1 py-2.5 rounded-xl text-sm font-bold bg-primary text-dark-bg transition">
+                    Masuk
+                </button>
+                <button id="tab-register" data-action="switch-auth-tab" data-tab="register"
+                    class="flex-1 py-2.5 rounded-xl text-sm font-bold text-gray-400 transition">
+                    Daftar
+                </button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-gray-300 mb-1 block">Email</label>
+                    <div class="relative">
+                        <i
+                            class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="email" id="login-email" required placeholder="email@contoh.com"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-300 mb-1 block">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="password" id="login-password" required placeholder="••••••••" minlength="6"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition">
+                    </div>
+                </div>
+                <button type="submit" id="login-btn"
+                    class="w-full bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Masuk</span>
+                </button>
+            </form>
+
+            <!-- REGISTER FORM (Hidden by default) -->
+            <form id="register-form" class="space-y-4 hidden">
+                <div>
+                    <label class="text-xs font-semibold text-gray-300 mb-1 block">Nama Lengkap</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="text" id="reg-name" required placeholder="Nama lengkap kamu"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-300 mb-1 block">Email</label>
+                    <div class="relative">
+                        <i
+                            class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="email" id="reg-email" required placeholder="email@contoh.com"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-300 mb-1 block">No. HP (Opsional)</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="tel" id="reg-phone" placeholder="08123456789"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-300 mb-1 block">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="password" id="reg-password" required placeholder="Min. 6 karakter" minlength="6"
+                            class="w-full bg-dark-bg border border-dark-accent rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition">
+                    </div>
+                </div>
+                <button type="submit" id="register-btn"
+                    class="w-full bg-primary hover:bg-primary-dark text-dark-bg font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Daftar Sekarang</span>
+                </button>
+            </form>
+
+            <!-- Status Message -->
+            <div id="auth-status" class="hidden text-center text-xs p-3 rounded-xl"></div>
+
+            <!-- Divider -->
+            <div class="flex items-center gap-3">
+                <div class="flex-1 h-px bg-dark-accent"></div>
+                <span class="text-xs text-gray-500">atau</span>
+                <div class="flex-1 h-px bg-dark-accent"></div>
+            </div>
+
+            <!-- Continue as Guest -->
+            <a href="index.html" id="guest-btn"
+                class="w-full bg-dark-bg hover:bg-dark-accent border border-dark-accent text-gray-200 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 text-sm">
+                <i class="fa-solid fa-user-secret text-primary"></i>
+                <span>Lanjut sebagai Tamu (Non-Member)</span>
+            </a>
+        </div>
+
+        <!-- Info -->
+        <p class="text-center text-[10px] text-gray-500 mt-4">
+            Dengan masuk, kamu setuju dengan <span class="text-primary">Syarat & Ketentuan</span> kami.
+        </p>
+    </div>
+
+    <script type="module">
+        import { login, registerMember, initAuth } from './js/auth.js';
+
+        // Cek apakah sudah login
+        const authState = await initAuth();
+        if (authState.loggedIn) {
+            window.location.href = authState.role === 'admin' ? 'admin.html' : 'index.html';
+        }
+
+        // Tab Switcher
+        document.querySelectorAll('[data-action="switch-auth-tab"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+            const tab = btn.dataset.tab;
+            document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+            document.getElementById('tab-login').className = tab === 'login' ? 'flex-1 py-2.5 rounded-xl text-sm font-bold bg-primary text-dark-bg transition' : 'flex-1 py-2.5 rounded-xl text-sm font-bold text-gray-400 transition';
+            document.getElementById('tab-register').className = tab === 'register' ? 'flex-1 py-2.5 rounded-xl text-sm font-bold bg-primary text-dark-bg transition' : 'flex-1 py-2.5 rounded-xl text-sm font-bold text-gray-400 transition';
+            });
+        });
+
+        // Login Handler
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Memproses...';
+            
+            const result = await login(document.getElementById('login-email').value, document.getElementById('login-password').value);
+            
+            if (result.success) {
+            setTimeout(() => window.location.href = result.role === 'admin' ? 'admin.html' : 'index.html', 1000);
+            } else {
+            alert(result.error);
+            btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> <span>Masuk</span>';
+            }
+        });
+
+        // Register Handler
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('register-btn');
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Mendaftar...';
+            
+            const result = await registerMember(
+            document.getElementById('reg-email').value,
+            document.getElementById('reg-password').value,
+            document.getElementById('reg-name').value,
+            document.getElementById('reg-phone').value
+            );
+            
+            if (result.success) {
+            alert(result.message);
+            document.getElementById('tab-login').click();
+            btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> <span>Daftar Sekarang</span>';
+            } else {
+            alert(result.error);
+            btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> <span>Daftar Sekarang</span>';
+            }
+        });
+
+        // Helpers
+        function showStatus(msg, type) {
+            const el = document.getElementById('auth-status');
+            el.classList.remove('hidden');
+            if (type === 'success') {
+                el.className = 'text-center text-xs p-3 rounded-xl bg-green-500/20 text-green-400 border border-green-500/30';
+                el.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> ${msg}`;
+            } else {
+                el.className = 'text-center text-xs p-3 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30';
+                el.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> ${msg}`;
+            }
+        }
+
+        function hideStatus() {
+            document.getElementById('auth-status').classList.add('hidden');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+/* Base Styles */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #261A16;
+  color: #FDFBF7;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbars for slick mobile horizontal scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth pulse & badges */
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.pulse-btn {
+  animation: pulse-subtle 2s infinite ease-in-out;
+}
+
+/* Glassmorphism subtle overlay */
+.glass-panel {
+  background: rgba(56, 33, 18, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 191, 30, 0.15);
+}
+
+.glass-nav {
+  background: rgba(38, 26, 22, 0.95);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(89, 55, 32, 0.5);
+}
+
+/* Category Card Active State */
+.category-card.active {
+  background-color: #FFBF1E;
+  color: #261A16;
+  transform: translateY(-2px);
+}
+
+.category-card.active i {
+  color: #261A16 !important;
+}
+
+/* Animasi untuk popup logout */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px) scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
